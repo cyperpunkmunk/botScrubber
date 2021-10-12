@@ -19,13 +19,9 @@ dataText = []
 
 
 #loginfunciton
-def login(drive):
+def login(drive , homeUrl, username, password):
     
     #home webpage lgoin
-    homeUrl = "https://gravitylending.defisolutions.com/ui/login"
-
-    username = 'kgibson'
-    password = 'Kennethjr01+'
     drive.get(homeUrl)
     drive.find_element_by_xpath('//*[@id="username"]').send_keys(username)
     drive.find_element_by_xpath('//*[@id="password"]').send_keys(password)
