@@ -28,11 +28,6 @@ def login(drive , homeUrl, username, password):
     drive.find_element_by_xpath('//*[@id="submit-button"]').click()
     print('login successful')
 
-    
-#example loan cites
-
-loanUrl = "https://gravitylending.defisolutions.com/Funder/LoanApplications/Decisioning?loanApplicationID=90435102" #notEquifax
-loanUrl2 = "https://gravitylending.defisolutions.com/Funder/LoanApplications/Decisioning?loanApplicationID=91768847" #equifax
 
 
 
@@ -50,8 +45,7 @@ def getAppData(Url,drive):
     currentPage = drive.current_url
 
     drive.refresh()
-    testUrl = "https://weather.com/weather/tenday/l/Houston+TX?canonicalCityId=e7763a6187b4cb5fd0f85ad30c23f37f320bfe7e910e6fdbe90b501f206d265c"
-
+    
     drive.implicitly_wait(400)
 
     print(currentPage)
