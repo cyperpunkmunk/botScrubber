@@ -255,6 +255,7 @@ def getBureauData(drive):
         
         
     else: 
+        
         print('not eqifax')
         returnedData = auto.get_nonequifax_auto_data(bureauData)
         
