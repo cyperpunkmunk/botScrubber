@@ -97,8 +97,8 @@ def getAppData(Url,drive):
         
                 
         # how we translate it
-        #orgLoanTranslate = loanAmount.replace('.00','')
-        #remainingTranslate = remainingBal.replace('.00','')
+        orgLoanTranslate = loanAmount.replace('.00','')
+        remainingTranslate = remainingBal.replace('.00','')
         
         orgLoanTranslate = loanAmount
         remainingTranslate = remainingBal
@@ -214,8 +214,15 @@ def getBureauData(drive):
 
     x = re.search("THIS FORM PRODUCED BY EQUIFAX" , bureauData)
 
+    
+    #the variables we use for gettting loans and payoffs
+
+    # need to set the number of total open loans to a list to use in our spreadsheet
     global openCount
     openCount = []
+
+    global openCountStr
+    openCountStr = 0
 
     global currentCount
     currentCount = 0
@@ -255,8 +262,11 @@ def getBureauData(drive):
         
         
         currentAppLoan = []
-        openCountStr = 0
+        
+        
+        
         totalCount = 0
+        
         appMonths = []
         
         for data in returnedData:
@@ -278,7 +288,9 @@ def getBureauData(drive):
             
             elif data['status'] == 'OPEN':
 
+                #if the first number in the current pay record matches the first payoff number of the current loan
                 if cmdcurrPay[0:1] == translatedNums[0:1]:
+                    
 
                     cmdCurrentMonths = int(data['months'])   
                         
@@ -325,7 +337,7 @@ def getBureauData(drive):
         appMonths.append(totalCountTranslate)
         
         
-        
+     
         print(appMonths)
         print(currentCountTranslate)
         print(totalCountTranslate)

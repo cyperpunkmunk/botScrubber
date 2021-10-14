@@ -48,8 +48,10 @@ equiopen = "92852575" # matching errors for non equifax
 eqiuMix = '92885113'
 payoffError1 = '93131657'
 newOne = "94177038" # this one has a payments on current of 0
+newlendor ='94245265'
+bureauError = '94279712'# all 3 bureeauus give back and error
 
-cur3 = LOAN_URL + '94232715'
+cur3 = LOAN_URL + '94331087'
 
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
