@@ -51,7 +51,7 @@ newOne = "94177038" # this one has a payments on current of 0
 newlendor ='94245265'
 bureauError = '94279712'# all 3 bureeauus give back and error
 
-cur3 = LOAN_URL + '94349348'
+cur3 = LOAN_URL + '94352396'
 
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)

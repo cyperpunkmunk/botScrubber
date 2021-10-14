@@ -41,20 +41,59 @@ apphandler.getAppData(cur3,drive)
 
 
 
-def fillLoData(drive):
+#ppq type variable 
+ppqVer = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[3]/tbody/tr[1]/td[1]/label').text
+    
+# apr rate variable
+aprRate = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').get_attribute('value')
+
+
+def fillLoData(drive, ppqVer, aprRate):
 
     # thep list of ppq variables when its ok to do a hard pull request
-    needPpList = []
+    needPpList = ['LENTREE' , 'MYAL' , 'MYAL2' , 'V&D', 'MTG-LENDER']
+
+    print(ppqVer)
+    print(aprRate)
 
     # use this to choose ppq depending on what it says
     drive.implicitly_wait(400)
     ppqButton = Select(drive.find_element_by_xpath('//*[@id="528582"]'))
     drive.implicitly_wait(400)
-    ppqButton.select_by_value('YES')
+    
+    # variable to change the valu if it says 0.00%
+    aprRateText = drive.find_element_by_xpath('//*[@id="522672"]')
+    
+
+    def ppqCheck( variable , listOfNeedPP, button ):
+        
+        if variable in listOfNeedPP:
+            
+            button.select_by_value('NEED PP')
+            print('need pp')
+        
+        else:
+            button.select_by_value('YES')
+            print('yes')
+
+    
+    def aprCheck(aprVariable , textToSend):
+        
+        if aprVariable == '0.00%':
+
+            textToSend.send_keys('0.09')
+            
+        
+        else: 
+            
+            pass
+    
+    ppqCheck(ppqVer, needPpList, ppqButton)
+    aprCheck(aprRate, aprRateText)
     
 
 
-fillLoData(drive)
+fillLoData(drive, ppqVer, aprRate)
   
 
   
