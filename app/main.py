@@ -50,8 +50,10 @@ payoffError1 = '93131657'
 newOne = "94177038" # this one has a payments on current of 0
 newlendor ='94245265'
 bureauError = '94279712'# all 3 bureeauus give back and error
-
-cur3 = LOAN_URL + '94352396'
+y = '94375737'
+dd = '94398438' #bureau error
+sd = '94406353' # bureau error consumer file locked
+cur3 = LOAN_URL + '94408462'
 
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)

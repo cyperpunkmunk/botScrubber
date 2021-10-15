@@ -34,7 +34,7 @@ apphandler.login(drive, HOME_URL, USERNAME_ENV, PASSWORD_ENV)
 
 
 # 
-cur3 = LOAN_URL + '94341518'
+cur3 = LOAN_URL + '94406353'
 
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
@@ -58,15 +58,19 @@ def fillLoData(drive, ppqVer, aprRate):
 
     # use this to choose ppq depending on what it says
     drive.implicitly_wait(400)
+    
+    # how we get the button for the ppq table
     ppqButton = Select(drive.find_element_by_xpath('//*[@id="528582"]'))
     drive.implicitly_wait(400)
     
-    # variable to change the valu if it says 0.00%
+    # variable to change the value if it says 0.00%
     aprRateText = drive.find_element_by_xpath('//*[@id="522672"]')
-    
+    drive.implicitly_wait(400)
+
 
     def ppqCheck( variable , listOfNeedPP, button ):
         
+        # if our pp name is in the list of items tat need pp
         if variable in listOfNeedPP:
             
             button.select_by_value('NEED PP')
@@ -79,6 +83,7 @@ def fillLoData(drive, ppqVer, aprRate):
     
     def aprCheck(aprVariable , textToSend):
         
+
         if aprVariable == '0.00%':
 
             textToSend.send_keys('0.09')
@@ -87,9 +92,39 @@ def fillLoData(drive, ppqVer, aprRate):
         else: 
             
             pass
+
+    
+    #how we get our lo selector button for the pop-up menu
+    loPopupButton = Select(drive.find_element_by_xpath('//*[@id="assignedOptions"]'))
+    drive.implicitly_wait(400)
+
+    loName = 'Gibson, Kenneth'
+
+    def loSelect(button, name):
+        
+        # Select assign option button
+        button.select_by_value("2")
+        drive.implicitly_wait(400)
+
+        # button to select lo officer
+        button.select_by_visible_text(name) 
+
+
+
+
+
+
+        
+    
+
+
     
     ppqCheck(ppqVer, needPpList, ppqButton)
+    
     aprCheck(aprRate, aprRateText)
+    
+    loSelect(loPopupButton, loName)
+    
     
 
 
