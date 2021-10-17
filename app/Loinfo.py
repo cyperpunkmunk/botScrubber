@@ -70,9 +70,8 @@ def fillLoData(drive, ppqVer, aprRate):
 
     def ppqCheck( variable , listOfNeedPP, button ):
         
-        # if our pp name is in the list of items tat need pp
+        # if our pp name is in the list of items that need pp
         if variable in listOfNeedPP:
-            
             button.select_by_value('NEED PP')
             print('need pp')
         
@@ -106,32 +105,36 @@ def fillLoData(drive, ppqVer, aprRate):
     loname2 = 'Jones, Brian'
 
 
-    # need a new driver query to click on modle pop-up window
-    # under writer button = //*[@id="manageUserAssignment_modal"]/div/div[4]/div[2]/select
-    # csa button = //*[@id="manageUserAssignment_modal"]/div/div[7]/div[2]/select
 
+    def loSelect(name):
 
-    def loSelect(button, name):
-        
-        # Select assign option button
-        button.select_by_value("2")
+        # How we get our lo selector button for the pop-up menu
+        loPopupButton = Select(drive.find_element_by_xpath('//*[@id="assignedOptions"]'))
+        drive.implicitly_wait(400)
+        ## Select assign option button
+        loPopupButton.select_by_value("2")
         drive.implicitly_wait(400)
 
 
         # Button to select lo officer
         underwriterButtonVar = Select(drive.find_element_by_xpath('//*[@id="manageUserAssignment_modal"]/div/div[4]/div[2]/select'))
-        underwriterButtonVar.select_by_visible_text(name)
+        #underwriterButtonVar.select_by_visible_text(name)
         print('clicked on element')
 
 
-        # button to select CSA
+        # Button to select CSA
         CSAbuttonVar = Select(drive.find_element_by_xpath('//*[@id="manageUserAssignment_modal"]/div/div[7]/div[2]/select'))
-        CSAbuttonVar.select_by_visible_text(name)
-        print('selected second variable')
+        #CSAbuttonVar.select_by_visible_text(name)
+        print('clicked on second element')
 
 
+        # Button click to save the assigned user
+        drive.find_element_by_xpath('//*[@id="btnSaveAssignments"]').click()
+        
 
-        # button click to save the assigned user
+        
+        
+        
         
         
         
@@ -152,7 +155,7 @@ def fillLoData(drive, ppqVer, aprRate):
     
     aprCheck(aprRate, aprRateText)
     
-    loSelect(loPopupButton, loname2)
+    loSelect(loname2)
     
     
 
