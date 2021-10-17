@@ -97,8 +97,19 @@ def fillLoData(drive, ppqVer, aprRate):
     #how we get our lo selector button for the pop-up menu
     loPopupButton = Select(drive.find_element_by_xpath('//*[@id="assignedOptions"]'))
     drive.implicitly_wait(400)
+    
+
+    # has to be in this format
+    ## (Last ,First) 
 
     loName = 'Gibson, Kenneth'
+    loname2 = 'Jones, Brian'
+
+
+    # need a new driver query to click on modle pop-up window
+    # under writer button = //*[@id="manageUserAssignment_modal"]/div/div[4]/div[2]/select
+    # csa button = //*[@id="manageUserAssignment_modal"]/div/div[7]/div[2]/select
+
 
     def loSelect(button, name):
         
@@ -106,9 +117,27 @@ def fillLoData(drive, ppqVer, aprRate):
         button.select_by_value("2")
         drive.implicitly_wait(400)
 
-        # button to select lo officer
-        button.select_by_visible_text(name) 
 
+        # Button to select lo officer
+        underwriterButtonVar = Select(drive.find_element_by_xpath('//*[@id="manageUserAssignment_modal"]/div/div[4]/div[2]/select'))
+        underwriterButtonVar.select_by_visible_text(name)
+        print('clicked on element')
+
+
+        # button to select CSA
+        CSAbuttonVar = Select(drive.find_element_by_xpath('//*[@id="manageUserAssignment_modal"]/div/div[7]/div[2]/select'))
+        CSAbuttonVar.select_by_visible_text(name)
+        print('selected second variable')
+
+
+
+        # button click to save the assigned user
+        
+        
+        
+
+
+        
 
 
 
@@ -123,7 +152,7 @@ def fillLoData(drive, ppqVer, aprRate):
     
     aprCheck(aprRate, aprRateText)
     
-    loSelect(loPopupButton, loName)
+    loSelect(loPopupButton, loname2)
     
     
 
