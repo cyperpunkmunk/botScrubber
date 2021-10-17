@@ -130,6 +130,16 @@ def fillLoData(drive, ppqVer, aprRate):
 
         # Button click to save the assigned user
         drive.find_element_by_xpath('//*[@id="btnSaveAssignments"]').click()
+
+    # saving the data on our main page before we change pages
+    def saveFilledDataMain():    
+        
+        # Button to save everything on the main page (exccept for the saved approved lenders)
+        drive.find_element_by_xpath('//*[@id="btnSave"]')
+        print('saved page')
+        
+
+        
         
 
         
@@ -156,6 +166,8 @@ def fillLoData(drive, ppqVer, aprRate):
     aprCheck(aprRate, aprRateText)
     
     loSelect(loname2)
+
+    saveFilledDataMain()
     
     
 
