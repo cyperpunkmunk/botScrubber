@@ -15,7 +15,6 @@ SPREAD_SHEET_ID = os.getenv('SPREAD_SHEET_ID')
 HOME_URL = os.getenv('HOME_URL')
 USERNAME_ENV = os.getenv('USERNAME_ENV')
 PASSWORD_ENV = os.getenv('PASSWORD_ENV')
-
 '''
 maintenence notes
 need to update chromedriver and link to google sheet when its changed
@@ -53,7 +52,7 @@ bureauError = '94279712'# all 3 bureeauus give back and error
 y = '94375737'
 dd = '94398438' #bureau error
 sd = '94406353' # bureau error consumer file locked
-cur3 = LOAN_URL + '94408462'
+cur3 = LOAN_URL + '94542114'
 
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)

@@ -85,8 +85,7 @@ def getAppData(Url,drive):
     dataText.append(originalLoanAmout)
     dataText.append(remainingbalance)
     
-    # if the first payofff is 0
-    dataText.append(estimatedPayoff2)
+  
     
     # for when we need to translate our numbers
     def translateNums (loanAmount, remainingBal):
@@ -232,6 +231,7 @@ def getBureauData(drive):
     
     global currentApp
     
+    
     global appMonths
     appMonths = []
 
@@ -259,8 +259,6 @@ def getBureauData(drive):
         print('not eqifax')
         returnedData = auto.get_nonequifax_auto_data(bureauData)
         
-       
-        
         
         currentAppLoan = []
         
@@ -276,15 +274,14 @@ def getBureauData(drive):
             cmdcurrPay = data['prices']
             cmdTotalMonths = data['months']
 
-            
+            #turning the total months into an int
             totalMonthsInt = int(cmdTotalMonths)
             
             totalCount += totalMonthsInt
             
             if data['status'] == 'N/A':
-                
-
-
+            
+            
                 continue
             
             elif data['status'] == 'OPEN':
@@ -292,7 +289,6 @@ def getBureauData(drive):
                 #if the first number in the current pay record matches the first payoff number of the current loan
                 if cmdcurrPay[0:1] == translatedNums[0:1]:
                     
-
                     cmdCurrentMonths = int(data['months'])   
                         
                     currentAppLoan.append(cmd)
@@ -361,8 +357,7 @@ def googleSheetfill(scopesNew,jsonFile,sheetId):
 
     
     if dataText[2] == '$0.00':
-         
-        
+           
         dataText[2] = translatedNums[1]
         
         if dataText[2] == "$0.00":

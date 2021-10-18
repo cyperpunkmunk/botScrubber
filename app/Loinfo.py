@@ -20,12 +20,11 @@ need to update chromedriver and link to google sheet when its changed
 '''
 
 
-#webdriver options 
+# Webdriver options 
 opts = Options()
 opts.add_argument(" --headeless")
 opts.add_experimental_option('excludeSwitches', ['enable-logging'])
 drive = webdriver.Chrome(options=opts, executable_path=WEB_DRIVER_PATH)
-
 
 
 
@@ -34,11 +33,10 @@ apphandler.login(drive, HOME_URL, USERNAME_ENV, PASSWORD_ENV)
 
 
 # 
-cur3 = LOAN_URL + '94406353'
+cur3 = LOAN_URL + '94538996'
 
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
-
 
 
 #ppq type variable 
@@ -64,7 +62,7 @@ def fillLoData(drive, ppqVer, aprRate):
     drive.implicitly_wait(400)
     
     # variable to change the value if it says 0.00%
-    aprRateText = drive.find_element_by_xpath('//*[@id="522672"]')
+    aprRateText = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').text
     drive.implicitly_wait(400)
 
 
@@ -80,22 +78,27 @@ def fillLoData(drive, ppqVer, aprRate):
             print('yes')
 
     
-    def aprCheck(aprVariable , textToSend):
-        
+    def aprCheck():
 
-        if aprVariable == '0.00%':
+        # Variable to change the value if it says 0.00%
+        aprRateText = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').get_attribute('value')
+        drive.implicitly_wait(400)
+        # Variable to change the number
+        aprRateChangeVar = drive.find_element_by_xpath('//*[@id="522672"]')
 
-            textToSend.send_keys('0.09')
+        if aprRateText == '0.00':
+
+            aprRateChangeVar.send_keys('')
+            aprRateChangeVar.send_keys('00.2')
             
         
         else: 
-            
+            aprRateChangeVar.send_keys('')
+            aprRateChangeVar.send_keys('00.2')
             pass
 
     
-    #how we get our lo selector button for the pop-up menu
-    loPopupButton = Select(drive.find_element_by_xpath('//*[@id="assignedOptions"]'))
-    drive.implicitly_wait(400)
+
     
 
     # has to be in this format
@@ -118,13 +121,13 @@ def fillLoData(drive, ppqVer, aprRate):
 
         # Button to select lo officer
         underwriterButtonVar = Select(drive.find_element_by_xpath('//*[@id="manageUserAssignment_modal"]/div/div[4]/div[2]/select'))
-        #underwriterButtonVar.select_by_visible_text(name)
+        underwriterButtonVar.select_by_visible_text(name)
         print('clicked on element')
 
 
         # Button to select CSA
         CSAbuttonVar = Select(drive.find_element_by_xpath('//*[@id="manageUserAssignment_modal"]/div/div[7]/div[2]/select'))
-        #CSAbuttonVar.select_by_visible_text(name)
+        CSAbuttonVar.select_by_visible_text(name)
         print('clicked on second element')
 
 
@@ -160,14 +163,20 @@ def fillLoData(drive, ppqVer, aprRate):
     
 
 
-    
+    # How we check the pp lender and fill the form depending on which one it is
     ppqCheck(ppqVer, needPpList, ppqButton)
     
-    aprCheck(aprRate, aprRateText)
+    # Checking and filling in our apr rate
+    aprCheck()
     
-    loSelect(loname2)
+    # Saving the data we fill in
+    # saveFilledDataMain()
 
-    saveFilledDataMain()
+    # Filling the form in to choose our user
+    loSelect(loName)
+
+    # Saving the data again
+    # saveFilledDataMain()
     
     
 
