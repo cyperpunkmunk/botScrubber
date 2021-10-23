@@ -254,25 +254,48 @@ def getBureauData(drive):
         # variable to keep track of the total number of months
         equifaxTotalMonths = 0
 
+        # variable to keep track of total open loans
+        equifaxTotalOpenLoans = 0
+
+        # variable to keep track of number of payments on current loan
+        equifaxPaymentsOnCurent = 0
+
         # getting each loan
         for loan in returnedData:
             # giving each loan a variable to be able to store its data
             cmd = loan['status'], loan['months'], loan["prices"]
             
             if cmd[0] == "N/A":
-                print('INVALID STATUS')
+                print('LOAN WITH INVALID STATUS')
             
             else:
                 # if th staus is valid then it checks to see if the months are valid
                 if cmd[1] == "N/A":
-                    print('INVALID MONTHS')
+                    print('LOAN WITH INVALID MONTHS')
                 
                 else:
                     # turning each months from loan into and intiger to use later 
                     equifaxMonthsStrToInt = int(cmd[1])
                     # adding each loan months to the total months loan 
                     equifaxTotalMonths += equifaxMonthsStrToInt
+
+                    # checking to see if it is an open or closed loan
+                    if cmd[0] == "OPEN":
+                        
+                        equifaxTotalOpenLoans += 1
+
+                        equifaxLoanPayoff = (cmd[2])
+                        
+
+
                     
+                    else:
+                        print('CLOSED LOAN')
+
+
+                    
+        print(equifaxTotalMonths)
+        print(equifaxTotalOpenLoans)
 
 
             
