@@ -5,6 +5,10 @@ import apphandler # file that reutuns our funcitons to get the data from our app
 import os
 from dotenv import load_dotenv
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 #getting our variables from the .env file
 load_dotenv()
 WEB_DRIVER_PATH = os.getenv('WEB_DRIVER_PATH')
@@ -32,8 +36,9 @@ drive = webdriver.Chrome(options=opts, executable_path=WEB_DRIVER_PATH)
 apphandler.login(drive, HOME_URL, USERNAME_ENV, PASSWORD_ENV)
 
 
-# 
-cur3 = LOAN_URL + '94538996'
+
+cur3 = LOAN_URL + '94764207'
+
 
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
@@ -82,20 +87,37 @@ def fillLoData(drive, ppqVer, aprRate):
 
         # Variable to change the value if it says 0.00%
         aprRateText = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').get_attribute('value')
+        
         drive.implicitly_wait(400)
+        
         # Variable to change the number
+        #WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='522672']"))).send_keys('00.2')
         aprRateChangeVar = drive.find_element_by_xpath('//*[@id="522672"]')
+        #tdBox = drive.find_element_by_xpath('//*[@id="decisioning"]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]')
 
-        if aprRateText == '0.00':
+        if aprRate == '0.00%':
 
-            aprRateChangeVar.send_keys('')
-            aprRateChangeVar.send_keys('00.2')
+          
+            #tdBox.click()
+            #drive.find_element_by_xpath('//*[@id="522672"]').send_keys('00.2')
+
+            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='522672']"))).send_keys('00.2')
+            drive.find_element_by_xpath('//*[@id="btnSave"]')
+            print('need apr')
             
         
-        else: 
-            aprRateChangeVar.send_keys('')
-            aprRateChangeVar.send_keys('00.2')
-            pass
+        else:
+
+    
+
+            drive.implicitly_wait(400)
+            
+            # drive.find_element_by_xpath('//*[@id="522672"]').send_keys('00.2')
+            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='522672']"))).send_keys('00.2')
+            drive.find_element_by_xpath('//*[@id="btnSave"]')
+            print('no apr')
+
+            
 
     
 
@@ -134,6 +156,7 @@ def fillLoData(drive, ppqVer, aprRate):
         # Button click to save the assigned user
         drive.find_element_by_xpath('//*[@id="btnSaveAssignments"]').click()
 
+    
     # saving the data on our main page before we change pages
     def saveFilledDataMain():    
         
@@ -142,41 +165,31 @@ def fillLoData(drive, ppqVer, aprRate):
         print('saved page')
         
 
-        
-        
 
-        
-        
-        
-        
-        
-        
-
-
-        
-
-
-
-
-
-        
     
 
 
     # How we check the pp lender and fill the form depending on which one it is
     ppqCheck(ppqVer, needPpList, ppqButton)
-    
+
+    drive.implicitly_wait(400)
+
     # Checking and filling in our apr rate
     aprCheck()
     
-    # Saving the data we fill in
-    # saveFilledDataMain()
+    drive.implicitly_wait(400)
+
+    
+
+    drive.implicitly_wait(400)
 
     # Filling the form in to choose our user
     loSelect(loName)
 
+    drive.implicitly_wait(400)
+
     # Saving the data again
-    # saveFilledDataMain()
+    saveFilledDataMain()
     
     
 

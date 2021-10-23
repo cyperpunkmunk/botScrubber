@@ -212,11 +212,12 @@ def getBureauData(drive):
     bureauData = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/div[3]/div[3]/span/div/pre').text
 
     x = re.search("THIS FORM PRODUCED BY EQUIFAX" , bureauData)
-
+    y = re.search("TRANSUNION CREDIT REPORT" , bureauData)
     
     #the variables we use for gettting loans and payoffs
 
     # need to set the number of total open loans to a list to use in our spreadsheet
+    
     global openCount
     openCount = []
 
@@ -252,7 +253,10 @@ def getBureauData(drive):
         print(translatedNums)
         print(openCount)
         print(returnedData)
-        
+    
+
+    elif y:
+        print('this was made with the new lender')
         
     else: 
         
