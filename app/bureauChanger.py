@@ -37,4 +37,17 @@ apphandler.login(drive, HOME_URL, USERNAME_ENV, PASSWORD_ENV)
 
 
 
-cur3 = LOAN_URL + ''
+cur3 = LOAN_URL + '94809157'
+
+#gets everything from decision page
+apphandler.getAppData(cur3,drive)
+
+
+def experianSelect():
+    bureauButton = Select(drive.find_element_by_xpath('//*[@id="551437"]'))
+    bureauButton.select_by_value('Equifax')
+    
+    WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="btnSave"]'))).click()
+
+
+experianSelect()

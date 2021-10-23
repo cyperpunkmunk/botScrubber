@@ -121,6 +121,7 @@ def getAppData(Url,drive):
 
 
     states = {
+        
         "AL": "Alabama",
         "AK": "Alaska",
         "AZ": "Arizona",
@@ -218,18 +219,25 @@ def getBureauData(drive):
 
     # need to set the number of total open loans to a list to use in our spreadsheet
     
+    
+    
+    # a transferable list for our spreadsheet to use when taking the number of total open loans
     global openCount
     openCount = []
-
+    
+    #the int of the total amount of open auto loans
     global openCountStr
     openCountStr = 0
 
+    # the total amount of months on the current loan
     global currentCount
     currentCount = 0
     
+    # the total amount of months on in a list for the spreadsheet to understand
     global openList
     openList = []
     
+    # the current app 
     global currentApp
     
     
@@ -242,17 +250,52 @@ def getBureauData(drive):
 
         print('this was made with equifax')
         returnedData = auto.get_equifax_auto_data(bureauData)
+        
+        # variable to keep track of the total number of months
+        equifaxTotalMonths = 0
 
-                #compare(translatedNums[0],loan)
+        # getting each loan
+        for loan in returnedData:
+            # giving each loan a variable to be able to store its data
+            cmd = loan['status'], loan['months'], loan["prices"]
+            
+            if cmd[0] == "N/A":
+                print('INVALID STATUS')
+            
+            else:
+                # if th staus is valid then it checks to see if the months are valid
+                if cmd[1] == "N/A":
+                    print('INVALID MONTHS')
+                
+                else:
+                    # turning each months from loan into and intiger to use later 
+                    equifaxMonthsStrToInt = int(cmd[1])
+                    # adding each loan months to the total months loan 
+                    equifaxTotalMonths += equifaxMonthsStrToInt
+                    
+
+
+            
+
+
+            
+            
+
+        
+                
+           
+               
+
+
+
+        
+
+        
 
 
       
-        print('euifax translated list')
-  
-        print('translated nums')
-        print(translatedNums)
-        print(openCount)
-        print(returnedData)
+    
+ 
     
 
     elif y:
@@ -302,18 +345,18 @@ def getBureauData(drive):
                     print(currentAppLoan)
                 
                 else:
-                    continue
+                    pass
 
 
                 openCountStr += 1
                 openList.append(cmd)
      
-                continue
+                pass
 
             else:    
                 openList.append(cmd)
 
-                continue
+                pass
         
             
         
