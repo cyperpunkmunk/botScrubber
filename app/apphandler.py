@@ -282,10 +282,70 @@ def getBureauData(drive):
                     # checking to see if it is an open or closed loan
                     if cmd[0] == "OPEN":
                         
+                        # if its an open loan we add it to the total amount of open loans
                         equifaxTotalOpenLoans += 1
 
+                        # giving the loan payoff list a variable
                         equifaxLoanPayoff = (cmd[2])
                         
+                        # checking each number in the list
+                        currentLoanPayoffs = []
+                        
+                        #translating the numbers so we can compare them to the numbers the bureau gives us
+                        translatedForEquifaxNumbers = []
+
+                        # getting the number from this loan and putting them into a list to compare to the payoff numbers on the app 
+                        for number in equifaxLoanPayoff:
+                            # appending to the list
+                            currentLoanPayoffs.append(number)
+                        
+                        # getting each number from the translated numbers var to compare them to the data in a new list with the numbers that are translated for equifax
+                        for num in translatedNums:
+                            
+                            #getting rid of the comma in with the first variable
+                            translatedNum = num.replace(",", "")
+                            
+                            # getting rid of the .00 with the second variable
+                            translatedNum2 = translatedNum.replace(".00", "") 
+                            
+                            # appending the numbers to the list to be compared later
+                            translatedForEquifaxNumbers.append(translatedNum2)
+
+                        # giving a list in reverse because sometimes we get data back that goes either way
+                        translatedForEquifaxNumbersReverse = translatedForEquifaxNumbers.reverse()
+                        
+                        for comparedNum in currentLoanPayoffs:
+                            
+                            for comparedNum1 in translatedForEquifaxNumbers:
+                                
+                                if comparedNum == comparedNum1:
+                                    print('THESE NUMBERS MATCH')
+                                
+                                else:
+                                    print('THESE NUMBERS DONT MATCH')
+                                
+                              
+
+                        for comparedNum in currentLoanPayoffs:
+
+                            for comparedNum1 in reversed(translatedForEquifaxNumbers):
+
+                                if comparedNum == comparedNum1:
+                                            
+                                    print('THESE NUMBERS MATCH REVERSED')
+                                
+                                else:
+
+                                    print('THESE NUMBERS DONT MATCH REVERSED')
+
+
+                                
+                               
+
+                        print(translatedForEquifaxNumbers)
+                        print(translatedForEquifaxNumbersReverse)
+                        print(currentLoanPayoffs)
+
 
 
                     
