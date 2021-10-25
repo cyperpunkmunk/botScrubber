@@ -12,6 +12,7 @@ from selenium import webdriver
 from googleapiclient.discovery import build
 from selenium.webdriver.chrome.options import Options
 from google.oauth2 import service_account
+
 import auto
 
 # dataText 
@@ -274,6 +275,7 @@ def getBureauData(drive):
                     print('LOAN WITH INVALID MONTHS')
                 
                 else:
+                    
                     # turning each months from loan into and intiger to use later 
                     equifaxMonthsStrToInt = int(cmd[1])
                     # adding each loan months to the total months loan 
@@ -296,59 +298,59 @@ def getBureauData(drive):
 
                         # getting the number from this loan and putting them into a list to compare to the payoff numbers on the app 
                         for number in equifaxLoanPayoff:
+                            
+                            #  translating the numbers to match later
+                            numTranslated = number.replace('$', "")
+                            
                             # appending to the list
-                            currentLoanPayoffs.append(number)
+                            currentLoanPayoffs.append(numTranslated)
                         
                         # getting each number from the translated numbers var to compare them to the data in a new list with the numbers that are translated for equifax
                         for num in translatedNums:
                             
                             #getting rid of the comma in with the first variable
                             translatedNum = num.replace(",", "")
+
+                            # getting rid of the $ s we can turn it into an int later
+                            translatedNum1 = translatedNum.replace("$", "")
                             
                             # getting rid of the .00 with the second variable
-                            translatedNum2 = translatedNum.replace(".00", "") 
+                            translatedNum2 = translatedNum1.replace(".00", "") 
                             
                             # appending the numbers to the list to be compared later
                             translatedForEquifaxNumbers.append(translatedNum2)
 
-                        # giving a list in reverse because sometimes we get data back that goes either way
-                        translatedForEquifaxNumbersReverse = translatedForEquifaxNumbers.reverse()
-                        
-                        for comparedNum in currentLoanPayoffs:
+                        # checking the lists to see if they match without being revesed
+                        if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
                             
-                            for comparedNum1 in translatedForEquifaxNumbers:
-                                
-                                if comparedNum == comparedNum1:
-                                    print('THESE NUMBERS MATCH')
-                                
-                                else:
-                                    print('THESE NUMBERS DONT MATCH')
-                                
-                              
+                            # adding the months from ths loan to the total payments on current if they match this way
+                            equifaxPaymentsOnCurent += int(cmd[1])
 
-                        for comparedNum in currentLoanPayoffs:
+                            print('this is the current loan matched without being reversed')
 
-                            for comparedNum1 in reversed(translatedForEquifaxNumbers):
+                            
+                        # checking to see if they match while being reversed
+                        elif (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[1])) or (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
+                            
+                            # adding the months from ths loan to the total payments on current if they match this way
+                            equifaxPaymentsOnCurent += int(cmd[1])
 
-                                if comparedNum == comparedNum1:
-                                            
-                                    print('THESE NUMBERS MATCH REVERSED')
-                                
-                                else:
-
-                                    print('THESE NUMBERS DONT MATCH REVERSED')
-
-
+                            print('these numbers matched reversed')
+                            
+                            
+                        else:
+                            
+                            print('this isint a match')
                                 
                                
 
                         print(translatedForEquifaxNumbers)
-                        print(translatedForEquifaxNumbersReverse)
+                        
                         print(currentLoanPayoffs)
 
 
 
-                    
+                    # if it isnt open this is what we do when its closed
                     else:
                         print('CLOSED LOAN')
 
@@ -356,6 +358,7 @@ def getBureauData(drive):
                     
         print(equifaxTotalMonths)
         print(equifaxTotalOpenLoans)
+        print(equifaxPaymentsOnCurent)
 
 
             
