@@ -216,35 +216,68 @@ def getBureauData(drive):
 
     x = re.search("THIS FORM PRODUCED BY EQUIFAX" , bureauData)
     y = re.search("TRANSUNION CREDIT REPORT" , bureauData)
+        
     
-    #the variables we use for gettting loans and payoffs
+    ## transferable list for our spreadsheet to use when filling in data
+    
+    # the total count of the months on evry auto loan 
+    global totalLoanCount
+    totalLoanCount = []
+    # the total number of open loans
+    global totalOpenLoanCount
+    totalOpenLoanCount = []
+    # The number of months on the current
+    global currentLoanMonths
+    currentLoanMonths = []
 
-    # need to set the number of total open loans to a list to use in our spreadsheet
     
     
-    
-    # a transferable list for our spreadsheet to use when taking the number of total open loans
-    global openCount
-    openCount = []
-    
-    #the int of the total amount of open auto loans
-    global openCountStr
-    openCountStr = 0
+    # function to scale the numbers down for the google sheet
+    def googleSheetNumberfilter(totalPaymentHistory, paymentsOnCurrent, openAutoLines):
+            
+        # if our numbers are over or equal to 24
+        if totalPaymentHistory >= 24:
+                
+            # change the total number to 24+ since thats the max the spreadsheet takes 
+            totalPaymentHistory = '24+'
+            totalLoanCount.append(totalPaymentHistory)
+            
+        else:
+            # if its less than 12 we just turn it it to a readable string for the spreadsheet
+            totalPaymentHistoryString = str(totalPaymentHistory)
+            totalLoanCount.append(totalPaymentHistoryString)
 
-    # the total amount of months on the current loan
-    global currentCount
-    currentCount = 0
-    
-    # the total amount of months on in a list for the spreadsheet to understand
-    global openList
-    openList = []
-    
-    # the current app 
-    global currentApp
-    
-    
-    global appMonths
-    appMonths = []
+            
+            
+        # if our numbers are over or equal to 12
+        if paymentsOnCurrent >= 12:
+                
+            # change the total number to 12+ since thats the max the spreadsheet takes 
+            paymentsOnCurrent = '12+'
+            currentLoanMonths.append(paymentsOnCurrent)
+            
+        else:
+            # if its less than 12 we just turn it it to a readable string for the spreadsheet
+            paymentsOnCurrentString = str(paymentsOnCurrent)
+            currentLoanMonths.append(paymentsOnCurrentString)
+                
+            
+            
+        # if our numbers are over or equal to 5
+        if openAutoLines >= 5:
+                
+            # change the total number to 5+ since thats the max the spreadsheet takes 
+            openAutoLines = '5+'
+            totalOpenLoanCount.append(openAutoLines)
+            
+        else:
+            # if its less than 12 we just turn it it to a readable string for the spreadsheet
+            paymentsOnCurrentString = str(openAutoLines)
+            totalOpenLoanCount.append(paymentsOnCurrentString)
+
+
+
+
 
     
         
@@ -374,6 +407,15 @@ def getBureauData(drive):
         print(equifaxTotalOpenLoans)
         print(equifaxPaymentsOnCurent)
 
+        # totalPaymentHistory, paymentsOnCurrent, openAutoLines
+        googleSheetNumberfilter(equifaxTotalMonths, equifaxPaymentsOnCurent, equifaxTotalOpenLoans)
+
+        print('new data')
+
+        print(totalLoanCount)
+        print(currentLoanMonths)
+        print(totalOpenLoanCount)
+
 
 
 
@@ -436,9 +478,84 @@ def getBureauData(drive):
                     #translating the numbers so we can compare them to the numbers the bureau gives us
                     translatedForNonEquifaxNumbers = []
 
+                    for num in nonEquifaxLoanPayoff:
+                        
+                        # getting rid of the $ with the second variable
+                        translatedN = num.replace("$", "")
+
+                        translatedN1 = translatedN.replace(",", "") 
+                                
+                        # appending the numbers to the list to be compared later
+                        currentLoanPayoffs.append(translatedN1)
+                        
+
+                    # getting each number from the translated numbers var to compare them to the data in a new list with the numbers that are translated for equifax
+                    for num in translatedNums:
+
+                        #getting rid of the comma in with the first variable
+                        translatedNum = num.replace(",", "")
+
+                        # getting rid of the $ s we can turn it into an int later
+                        translatedNum1 = translatedNum.replace("$", "")
+                            
+                        # getting rid of the .00 with the second variable
+                        translatedNum2 = translatedNum1.replace(".00", "") 
+                            
+                        # appending the numbers to the list to be compared later
+                        translatedForNonEquifaxNumbers.append(translatedNum2)
+
+
+                    # checking the lists to see if they match without being revesed
+                    if (int(translatedForNonEquifaxNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForNonEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
+
+                        # adding the months from ths loan to the total payments on current if they match this way
+                        nonEquifaxPaymentsOnCurent += int(cmd[1])
+
+                        print('this is the current loan matched without being reversed')
+                    
+                    # checking to see if they match while being reversed
+                    elif (int(translatedForNonEquifaxNumbers[0]) == int(currentLoanPayoffs[1])) or (int(translatedForNonEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
+                            
+
+                        # adding the months from ths loan to the total payments on current if they match this way
+                        nonEquifaxPaymentsOnCurent += int(cmd[1])
+
+                        print('these numbers matched reversed')
+                            
+                            
+                    else:
+                            
+                        print('this isint a match')
+
+                    
+
+                    print(currentLoanPayoffs)
+                    print(translatedForNonEquifaxNumbers)  
+
+                
+                else:
+                    print('CLOSED LOAN')
+                
+                
         
-        print( nonEquifaxTotalMonths)
+        print(nonEquifaxTotalMonths)
         print(nonEquifaxTotalOpenLoans)
+        print(nonEquifaxPaymentsOnCurent)
+
+        # totalPaymentHistory, paymentsOnCurrent, openAutoLines
+        googleSheetNumberfilter(nonEquifaxTotalMonths, nonEquifaxPaymentsOnCurent, nonEquifaxTotalOpenLoans)        
+
+        print('new data')
+
+        print(totalLoanCount)
+        print(totalOpenLoanCount)
+        print(currentLoanMonths)
+
+        
+
+
+    
+        
 
                 
         
@@ -513,18 +630,18 @@ def googleSheetfill(scopesNew,jsonFile,sheetId):
     
 
     openFill = sheet.values().update(spreadsheetId = sheetId,
-                            range="Sheet4!J3", valueInputOption="USER_ENTERED", body={"values": [[openCount[0]]]}).execute()
+                            range="Sheet4!J3", valueInputOption="USER_ENTERED", body={"values": [[totalOpenLoanCount[0]]]}).execute()
 
     
     totalAutoPaymentMonthsFill = sheet.values().update(spreadsheetId = sheetId,
-                            range="Sheet4!H3", valueInputOption="USER_ENTERED", body={"values": [[appMonths[1]]]}).execute()
+                            range="Sheet4!H3", valueInputOption="USER_ENTERED", body={"values": [[totalLoanCount[0]]]}).execute()
     
     
     paymentsOnCurrentFill = sheet.values().update(spreadsheetId = sheetId,
-                            range="Sheet4!I3", valueInputOption="USER_ENTERED", body={"values": [[appMonths[0]]]}).execute()
+                            range="Sheet4!I3", valueInputOption="USER_ENTERED", body={"values": [[currentLoanMonths[0]]]}).execute()
                             
     
-    
+
     print(spreadSheetIdsTop)
     print(stateFill)
     

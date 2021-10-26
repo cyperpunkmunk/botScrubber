@@ -56,7 +56,7 @@ sd = '94406353' # bureau error consumer file locked
 dub = '94878395' # equifax loan on sum dumb shit
 dub2 = '94916333' # equifax loan on sum dumb shit
 
-cur3 = LOAN_URL + dub2
+cur3 = LOAN_URL + dub
 cur4 = LOAN_URL + payoffError1
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
@@ -81,16 +81,3 @@ apphandler.googleSheetfill(sco,jsfile,spreadid)
 
 
 
-
-'''
-values = result.get('values', [])
-
-if not values:
-   print('No data found.')
-else:
-   print('Name, Major:')
-   for row in values:
-      # Print columns A and E, which correspond to indices 0 and 4.
-      print('%s, %s' % (row[0], row[4]))
-
-'''
