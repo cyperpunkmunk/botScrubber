@@ -1,5 +1,6 @@
 
 from __future__ import print_function
+from inspect import _empty
 from typing import Text
 from selenium import webdriver
 from selenium.webdriver.common import keys
@@ -298,16 +299,21 @@ def getBureauData(drive):
 
                         # getting the number from this loan and putting them into a list to compare to the payoff numbers on the app 
                         for number in equifaxLoanPayoff:
+
+                            if number == '':
+                                break
                             
-                            #  translating the numbers to match later
-                            numTranslated = number.replace('$', "")
-                            
-                            # appending to the list
-                            currentLoanPayoffs.append(numTranslated)
+                            else:
+                                # translating the numbers to match later
+                                numTranslated = number.replace('$', "")
+                                
+                                # appending to the list
+                                currentLoanPayoffs.append(numTranslated)
                         
                         # getting each number from the translated numbers var to compare them to the data in a new list with the numbers that are translated for equifax
                         for num in translatedNums:
                             
+
                             #getting rid of the comma in with the first variable
                             translatedNum = num.replace(",", "")
 
@@ -322,7 +328,7 @@ def getBureauData(drive):
 
                         # checking the lists to see if they match without being revesed
                         if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
-                            
+
                             # adding the months from ths loan to the total payments on current if they match this way
                             equifaxPaymentsOnCurent += int(cmd[1])
 
@@ -332,6 +338,7 @@ def getBureauData(drive):
                         # checking to see if they match while being reversed
                         elif (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[1])) or (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
                             
+
                             # adding the months from ths loan to the total payments on current if they match this way
                             equifaxPaymentsOnCurent += int(cmd[1])
 
@@ -361,118 +368,40 @@ def getBureauData(drive):
         print(equifaxPaymentsOnCurent)
 
 
-            
-
-
-            
-            
-
-        
-                
-           
-               
 
 
 
-        
-
-        
-
-
-      
-    
- 
-    
 
     elif y:
         print('this was made with the new lender')
-        
+
+
+
+
+
+
     else: 
         
         print('not eqifax')
         returnedData = auto.get_nonequifax_auto_data(bureauData)
         
         
-        currentAppLoan = []
-        
-        
-        
-        totalCount = 0
-        
-        appMonths = []
+        # variable to keep track of the total number of months
+        nonEquifaxTotalMonths = 0
+
+        # variable to keep track of total open loans
+        noEquifaxTotalOpenLoans = 0
+
+        # variable to keep track of number of payments on current loan
+        nonEquifaxPaymentsOnCurent = 0
         
         for data in returnedData:
             
             cmd = data['status'], data['months'], data["prices"]
-            cmdcurrPay = data['prices']
-            cmdTotalMonths = data['months']
-
-            #turning the total months into an int
-            totalMonthsInt = int(cmdTotalMonths)
-            
-            totalCount += totalMonthsInt
-            
-            if data['status'] == 'N/A':
-            
-            
-                continue
-            
-            elif data['status'] == 'OPEN':
-
-                #if the first number in the current pay record matches the first payoff number of the current loan
-                if cmdcurrPay[0:1] == translatedNums[0:1]:
-                    
-                    cmdCurrentMonths = int(data['months'])   
-                        
-                    currentAppLoan.append(cmd)
-                    
-                    currentCount += cmdCurrentMonths
-
-                    print(currentAppLoan)
-                
-                else:
-                    pass
+            print(cmd)
 
 
-                openCountStr += 1
-                openList.append(cmd)
-     
-                pass
 
-            else:    
-                openList.append(cmd)
-
-                pass
-        
-            
-        
-        
-        openCount.append(str(openCountStr))
-        
-        
-        if currentCount >= 12:
-            currentCountTranslate = "12+"
-            
-        else: 
-            currentCountTranslate = str(currentCount)
-
-        if totalCount >= 24:
-            totalCountTranslate =  "24+"
-        
-        else:
-            totalCountTranslate = str(totalCount)
-        
-        
-        appMonths.append(currentCountTranslate)
-        appMonths.append(totalCountTranslate)
-        
-        
-     
-        print(appMonths)
-        print(currentCountTranslate)
-        print(totalCountTranslate)
-        print(openList)
-        print(openCount)
         
 
 
