@@ -300,9 +300,15 @@ def getBureauData(drive):
 
                         # getting the number from this loan and putting them into a list to compare to the payoff numbers on the app 
                         for number in equifaxLoanPayoff:
+                            
+                            # if the loan gives back a special case of a value with 0
+                            if number == '$':
+                                
+                                # filling the empty value with 0
+                                numTranslated = number.replace('$', "0")
 
-                            if number == '':
-                                break
+                                # appending to the list
+                                currentLoanPayoffs.append(numTranslated)
                             
                             else:
                                 # translating the numbers to match later
@@ -431,8 +437,8 @@ def getBureauData(drive):
                     translatedForNonEquifaxNumbers = []
 
         
-        print( "number of total months is: " + nonEquifaxTotalMonths)
-        print("number of total open loans" + nonEquifaxTotalOpenLoans)
+        print( nonEquifaxTotalMonths)
+        print(nonEquifaxTotalOpenLoans)
 
                 
         

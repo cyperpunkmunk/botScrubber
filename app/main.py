@@ -54,8 +54,9 @@ dd = '94398438' #bureau error
 sd = '94406353' # bureau error consumer file locked
 
 dub = '94878395' # equifax loan on sum dumb shit
+dub2 = '94916333' # equifax loan on sum dumb shit
 
-cur3 = LOAN_URL + loanUrl
+cur3 = LOAN_URL + dub2
 cur4 = LOAN_URL + payoffError1
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
