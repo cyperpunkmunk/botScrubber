@@ -264,6 +264,7 @@ def getBureauData(drive):
 
         # getting each loan
         for loan in returnedData:
+            
             # giving each loan a variable to be able to store its data
             cmd = loan['status'], loan['months'], loan["prices"]
             
@@ -390,15 +391,56 @@ def getBureauData(drive):
         nonEquifaxTotalMonths = 0
 
         # variable to keep track of total open loans
-        noEquifaxTotalOpenLoans = 0
+        nonEquifaxTotalOpenLoans = 0
 
         # variable to keep track of number of payments on current loan
         nonEquifaxPaymentsOnCurent = 0
         
         for data in returnedData:
             
+            # giving each loan a variable to be able to store its data
             cmd = data['status'], data['months'], data["prices"]
+            
             print(cmd)
+
+            if cmd[0] == "N/A":
+                
+                print('INVALID LOAN')
+            
+            else:
+
+                # turning each months from loan into and intiger to use later 
+                nonEquifaxMonthsStrToInt = int(cmd[1])
+                
+                # adding each loan months to the total months loan 
+                nonEquifaxTotalMonths += nonEquifaxMonthsStrToInt
+
+                # checking to see if it is an open or closed loan
+                if cmd[0] == "OPEN":
+                    
+                    # if its an open loan we add it to the total amount of open loans
+                    nonEquifaxTotalOpenLoans += 1
+
+                    # giving the loan payoff list a variable
+                    nonEquifaxLoanPayoff = (cmd[2])
+                        
+                    # checking each number in the list
+                    currentLoanPayoffs = []
+                        
+                    #translating the numbers so we can compare them to the numbers the bureau gives us
+                    translatedForNonEquifaxNumbers = []
+
+        
+        print( "number of total months is: " + nonEquifaxTotalMonths)
+        print("number of total open loans" + nonEquifaxTotalOpenLoans)
+
+                
+        
+        
+
+
+
+
 
 
 
