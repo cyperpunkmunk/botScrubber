@@ -53,11 +53,19 @@ y = '94375737'
 dd = '94398438' #bureau error
 sd = '94406353' # bureau error consumer file locked
 
-dub = '94878395' # equifax loan on sum dumb shit
-dub2 = '94916333' # equifax loan on sum dumb shit
+dub = '94878395' # equifax loan on sum dumb
+dub2 = '94916333' # equifax loan on sum dumb 
 
-cur3 = LOAN_URL + dub
-cur4 = LOAN_URL + payoffError1
+sd = '94993084' # equifax file freeze
+ssa = '94997723' # equifax banckruptcy
+ssawe3 = '95111726' #nonequifax banckruptcy2
+fk = '95053557' # nonequifax banckuptcy
+fgb = '95218758' # non equifax banckruptcy 
+ch  = '95107790'# customer with duplicate application
+ewgfe = '95221261' # file locked t consumers request 
+
+cur3 = LOAN_URL + '95225453'
+cur4 = LOAN_URL + ssawe3
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
  

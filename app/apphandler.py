@@ -2,6 +2,7 @@
 from __future__ import print_function
 from inspect import _empty
 from typing import Text
+from httplib2 import Response
 from selenium import webdriver
 from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
@@ -15,6 +16,8 @@ from selenium.webdriver.chrome.options import Options
 from google.oauth2 import service_account
 
 import auto
+
+
 
 # dataText 
 dataText = []
@@ -192,13 +195,26 @@ def getAppData(Url,drive):
     print(stateLong)
 
 
+    # county list for spreasheet function
+    global countyTranslated
+    countyTranslated = []
 
-def countyHandler():
-    print('hi')
+    # function to translate the county data we get from the app to be able to be used in the google sheet
+    def countyHandler():
+
+        # setting the county from our list to a variable that we can use later    
+        countyFilter = dataText[5]
+        
+        # removing "county" from the text
+        countyTranslate = countyFilter.replace(" County", "")
+
+        countyTranslated.append(countyTranslate)
+
+        
 
 
-
-    
+    countyHandler()
+        
 
     
 
@@ -639,11 +655,19 @@ def googleSheetfill(scopesNew,jsonFile,sheetId):
     
     paymentsOnCurrentFill = sheet.values().update(spreadsheetId = sheetId,
                             range="Sheet4!I3", valueInputOption="USER_ENTERED", body={"values": [[currentLoanMonths[0]]]}).execute()
-                            
+    
+    
+    countyFill = sheet.values().update(spreadsheetId = sheetId,
+                            range="Sheet4!A4", valueInputOption="USER_ENTERED", body={"values": [[countyTranslated[0]]]}).execute()
+
+
+   
     
 
     print(spreadSheetIdsTop)
     print(stateFill)
+
+ 
     
 
 
