@@ -15,6 +15,9 @@ from googleapiclient.discovery import build
 from selenium.webdriver.chrome.options import Options
 from google.oauth2 import service_account
 
+
+import extractDataTransunion
+import isBankruptcy
 import auto
 
 
@@ -232,6 +235,9 @@ def getBureauData(drive):
 
     x = re.search("THIS FORM PRODUCED BY EQUIFAX" , bureauData)
     y = re.search("TRANSUNION CREDIT REPORT" , bureauData)
+
+    # if we get a locked at consumers request error
+    s = re.search("FILE LOCKED AT CONSUMERS REQUEST", bureauData)
         
     
     ## transferable list for our spreadsheet to use when filling in data
@@ -293,7 +299,8 @@ def getBureauData(drive):
 
 
 
-
+    
+        
 
     
         
@@ -301,6 +308,12 @@ def getBureauData(drive):
 
         print('this was made with equifax')
         returnedData = auto.get_equifax_auto_data(bureauData)
+
+        isBankruptcy.isBankruptcy(bureauData)
+        
+
+        
+        
         
         # variable to keep track of the total number of months
         equifaxTotalMonths = 0
@@ -439,6 +452,23 @@ def getBureauData(drive):
 
     elif y:
         print('this was made with the new lender')
+        transUnionData = extractDataTransunion.extractAllData(bureauData)
+        print(transUnionData)
+
+ 
+
+    elif s:
+
+
+        # the total count of the months on evry auto loan 
+        totalLoanCount.append('24+')
+        
+        # the total number of open loans
+        totalOpenLoanCount.append("1")
+        
+        # The number of months on the current
+        currentLoanMonths.append("12+")
+        
 
 
 
@@ -447,9 +477,12 @@ def getBureauData(drive):
 
     else: 
         
+        
         print('not eqifax')
         returnedData = auto.get_nonequifax_auto_data(bureauData)
         
+        isBankruptcy.isBankruptcy(bureauData)
+
         
         # variable to keep track of the total number of months
         nonEquifaxTotalMonths = 0

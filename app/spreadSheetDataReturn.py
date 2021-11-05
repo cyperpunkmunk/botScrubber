@@ -41,7 +41,7 @@ get_spreadsheet_by_data_filter_request_body = {
     # The DataFilters used to select which ranges to retrieve from
     # the spreadsheet.
     'data_filters': [
-        
+
         {
             
         }

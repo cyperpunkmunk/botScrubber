@@ -63,9 +63,15 @@ fk = '95053557' # nonequifax banckuptcy
 fgb = '95218758' # non equifax banckruptcy 
 ch  = '95107790'# customer with duplicate application
 ewgfe = '95221261' # file locked t consumers request 
+egrc = '95239642' # credit bureau error
+rurhr = '95266936' # new lendor 2
+rtgrt = '95308158'# new lendor 3
+hiheiuru = '95366045' # new lendor 4
+efeguv = '95420633'# FILE FROZEN DUE TO FEDERAL LEGISLATION.
+oiwef = '95417554' # new lendor banckrupcty
 
-cur3 = LOAN_URL + '95225453'
-cur4 = LOAN_URL + ssawe3
+cur3 = LOAN_URL + '95420633'
+cur4 = LOAN_URL + fgb
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
  
