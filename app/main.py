@@ -15,6 +15,7 @@ SPREAD_SHEET_ID = os.getenv('SPREAD_SHEET_ID')
 HOME_URL = os.getenv('HOME_URL')
 USERNAME_ENV = os.getenv('USERNAME_ENV')
 PASSWORD_ENV = os.getenv('PASSWORD_ENV')
+
 '''
 maintenence notes
 need to update chromedriver and link to google sheet when its changed
@@ -35,7 +36,7 @@ apphandler.login(drive, HOME_URL, USERNAME_ENV, PASSWORD_ENV)
 
 
 
-#gets the apps data from he url
+#gets the apps data from the url
 appUrl = "91768847" #equifax
 loanUrl = "90435102" #notEquifax
 currUrl2 ='92195948'
@@ -70,7 +71,7 @@ hiheiuru = '95366045' # new lendor 4
 efeguv = '95420633'# FILE FROZEN DUE TO FEDERAL LEGISLATION.
 oiwef = '95417554' # new lendor banckrupcty
 
-cur3 = LOAN_URL + '95420633'
+cur3 = LOAN_URL + hiheiuru
 cur4 = LOAN_URL + fgb
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)

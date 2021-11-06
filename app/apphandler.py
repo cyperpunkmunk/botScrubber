@@ -10,7 +10,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 import re
-from selenium import webdriver
 from googleapiclient.discovery import build
 from selenium.webdriver.chrome.options import Options
 from google.oauth2 import service_account
@@ -238,6 +237,9 @@ def getBureauData(drive):
 
     # if we get a locked at consumers request error
     s = re.search("FILE LOCKED AT CONSUMERS REQUEST", bureauData)
+
+    # if we get a frozen file error
+    q = re.search("FREEZE ON CREDIT REPORT" , bureauData)
         
     
     ## transferable list for our spreadsheet to use when filling in data
@@ -450,17 +452,134 @@ def getBureauData(drive):
 
 
 
+    
+    
+
+    
     elif y:
         print('this was made with the new lender')
+
+        # variable to keep track of the total number of months
+        transUnionTotalMonths = 0
+
+        # variable to keep track of total open loans
+        transUnionTotalOpenLoans = 0
+
+        # variable to keep track of number of payments on current loan
+        transUnionPaymentsOnCurent = 0
+
+        
         transUnionData = extractDataTransunion.extractAllData(bureauData)
-        print(transUnionData)
 
+        # getting each loan
+        for loan in transUnionData:
+            
+            # setting the loans string to an intiger variable to add to the total months 
+            transUnionTotalMonthsInt = int(loan[1])
+
+            # Adding the total months intiger to the total months
+            transUnionTotalMonths += transUnionTotalMonthsInt
+
+            # if the loan is open
+            if loan[0] == 'OPEN':
+                
+                print(loan)
+
+                # if its an open loan we add it to the total amount of open loans
+                transUnionTotalOpenLoans += 1
+
+                # giving the loan payoff list a variable ['20300.0', '10800.0']
+                transUnionLoanPayoffList = loan[2]
+                
+
+                # checking each number in the list
+                currentLoanPayoffs = []
+                        
+                #translating the numbers so we can compare them to the numbers the bureau gives us
+                translatedForTransUnionNumbers = []
+
+                
+                for number in transUnionLoanPayoffList:
+                    
+                    #getting rid of the comma in with the first variable
+                    translatedLoanPayoff = number.replace(".0", "")
+
+                    #  comparing the first three numbers siince the rest are zeros
+                    translatedLoanPayoff1 = translatedLoanPayoff[0:3]
+
+                    #appending the translated numbers to the list
+                    currentLoanPayoffs.append(translatedLoanPayoff1)
+
+                
+                print(currentLoanPayoffs)
+                
+                
+                for num in translatedNums:
+
+                    # getting rid of the comma in with the first variable
+                    translatedNum = num.replace(",", "")
+
+                    # getting rid of the $ s we can turn it into an int later
+                    translatedNum1 = translatedNum.replace("$", "")
+                            
+                    # getting rid of the .00 with the second variable
+                    translatedNum2 = translatedNum1.replace(".00", "") 
+
+                    #  comparing the first three numbers since the rest are zeros
+                    translatedNum3 = translatedNum2[0:3]
+                            
+                    # appending the numbers to the list to be compared later
+                    translatedForTransUnionNumbers.append(translatedNum3)
+                
+                print(translatedForTransUnionNumbers)
+
+                
+                # checking the lists to see if they match without being revesed
+                if (int(translatedForTransUnionNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForTransUnionNumbers[1]) == int(currentLoanPayoffs[1])):
+
+                    # adding the months from ths loan to the total payments on current if they match this way
+                    currentLoanMonthsInt = loan[1]
+                    
+                    transUnionPaymentsOnCurent += int(currentLoanMonthsInt)
+
+                    print('this is the current loan matched without being reversed')
  
+                else:
+                                
+                    print('this isint a match')
 
+            
+
+            print(loan)
+        
+        print(transUnionTotalMonths)
+        print(transUnionTotalOpenLoans)
+        print(transUnionPaymentsOnCurent)
+        
+        # totalPaymentHistory, paymentsOnCurrent, openAutoLines
+        googleSheetNumberfilter(transUnionTotalMonths, transUnionPaymentsOnCurent, transUnionTotalOpenLoans)
+
+        
+    
+    
     elif s:
 
+        # the total count of the months on every auto loan 
+        totalLoanCount.append('24+')
+        
+        # the total number of open loans
+        totalOpenLoanCount.append("1")
+        
+        # The number of months on the current
+        currentLoanMonths.append("12+")
 
-        # the total count of the months on evry auto loan 
+
+        
+
+    elif q:
+
+
+        # the total count of the months on every auto loan 
         totalLoanCount.append('24+')
         
         # the total number of open loans
@@ -469,8 +588,6 @@ def getBureauData(drive):
         # The number of months on the current
         currentLoanMonths.append("12+")
         
-
-
 
 
 
