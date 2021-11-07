@@ -75,7 +75,7 @@ sasa = '95433188' # bug with '0' payment for one spot
 asc = '95434300' # same bug ^
 
 
-cur3 = LOAN_URL + '95450061'
+cur3 = LOAN_URL + '95520437'
 cur4 = LOAN_URL + fgb
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
