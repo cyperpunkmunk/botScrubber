@@ -10,7 +10,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 import re
-from selenium import webdriver
 from googleapiclient.discovery import build
 from selenium.webdriver.chrome.options import Options
 from google.oauth2 import service_account
@@ -213,14 +212,44 @@ def getAppData(Url,drive):
 
         countyTranslated.append(countyTranslate)
 
-        
-
-
     countyHandler()
+    
+    
+    # Checks file for "PUBLIC RECORD" section, and extracts the RPTD date.
+    # Input: string of whole file
+    # Output: (boolean, string)
+    def isBankruptcy(text):
+        global isBankrupt
+        global date
+        isBankrupt = False
+        date = ''
+
+        # Equifax:
+        eqRegex = re.compile(r'BKRPTCY-FILED:.*\n\s*RPTD:\s*([0-9,/]*)')
+        eqPR = 'PUBLIC RECORD INFORMATION'
+
+        if eqPR in text:
+            isBankrupt = True
+            match = eqRegex.search(text)
+            date = match.group(1)
+
+        # Non Equifax:
+        neqRegex = re.compile(r'PUBLIC RECORDS\s*-*\n(.*)\n')
+        neqPR = 'PUBLIC RECORDS'
+
+        if neqPR in text:
+            isBankrupt = True
+            match = neqRegex.search(text)
+            date = match.group(1)[34:44].strip()
         
+        # standardize date formatting to MM/DD/YYYY
+        if len(date) > 0:
+            date = parser.parse(date).strftime("%m/%d/%Y")
+        
+        print(isBankrupt, date)
+   
 
     
-
 
 
 def getBureauData(drive):
@@ -233,16 +262,31 @@ def getBureauData(drive):
 
     bureauData = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/div[3]/div[3]/span/div/pre').text
 
+    # bankruptcy,Br includes car, br status, Last Listed Date 
+    bankruptcyInfo = ['NO_BR','N/A', 'N/A', '']
+    
+    # returns true and the date of the bankruptcy if there is one
+    isBankrupt(bureauData)
+
+
+    
+
+
+
+
     x = re.search("THIS FORM PRODUCED BY EQUIFAX" , bureauData)
     y = re.search("TRANSUNION CREDIT REPORT" , bureauData)
 
     # if we get a locked at consumers request error
     s = re.search("FILE LOCKED AT CONSUMERS REQUEST", bureauData)
+
+    # if we get a frozen file error
+    q = re.search("FREEZE ON CREDIT REPORT" , bureauData)
         
     
     ## transferable list for our spreadsheet to use when filling in data
     
-    # the total count of the months on evry auto loan 
+    # the total count of the months on every auto loan 
     global totalLoanCount
     totalLoanCount = []
     # the total number of open loans
@@ -300,6 +344,7 @@ def getBureauData(drive):
 
 
     
+    # bankruptcy var if there isint one
         
 
     
@@ -309,11 +354,12 @@ def getBureauData(drive):
         print('this was made with equifax')
         returnedData = auto.get_equifax_auto_data(bureauData)
 
-        isBankruptcy.isBankruptcy(bureauData)
-        
 
         
         
+        
+
+        # bankruptcy var if there is one
         
         # variable to keep track of the total number of months
         equifaxTotalMonths = 0
@@ -322,7 +368,9 @@ def getBureauData(drive):
         equifaxTotalOpenLoans = 0
 
         # variable to keep track of number of payments on current loan
-        equifaxPaymentsOnCurent = 0
+        equifaxPaymentsOnCurrent = 0
+
+
 
         # getting each loan
         for loan in returnedData:
@@ -399,7 +447,7 @@ def getBureauData(drive):
                         if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
 
                             # adding the months from ths loan to the total payments on current if they match this way
-                            equifaxPaymentsOnCurent += int(cmd[1])
+                            equifaxPaymentsOnCurrent += int(cmd[1])
 
                             print('this is the current loan matched without being reversed')
 
@@ -409,7 +457,7 @@ def getBureauData(drive):
                             
 
                             # adding the months from ths loan to the total payments on current if they match this way
-                            equifaxPaymentsOnCurent += int(cmd[1])
+                            equifaxPaymentsOnCurrent += int(cmd[1])
 
                             print('these numbers matched reversed')
                             
@@ -434,10 +482,10 @@ def getBureauData(drive):
                     
         print(equifaxTotalMonths)
         print(equifaxTotalOpenLoans)
-        print(equifaxPaymentsOnCurent)
+        print(equifaxPaymentsOnCurrent)
 
         # totalPaymentHistory, paymentsOnCurrent, openAutoLines
-        googleSheetNumberfilter(equifaxTotalMonths, equifaxPaymentsOnCurent, equifaxTotalOpenLoans)
+        googleSheetNumberfilter(equifaxTotalMonths, equifaxPaymentsOnCurrent, equifaxTotalOpenLoans)
 
         print('new data')
 
@@ -450,17 +498,133 @@ def getBureauData(drive):
 
 
 
+    
+    
+
+    
     elif y:
         print('this was made with the new lender')
+
+        # variable to keep track of the total number of months
+        transUnionTotalMonths = 0
+
+        # variable to keep track of total open loans
+        transUnionTotalOpenLoans = 0
+
+        # variable to keep track of number of payments on current loan
+        transUnionPaymentsOnCurent = 0
+
+        
         transUnionData = extractDataTransunion.extractAllData(bureauData)
-        print(transUnionData)
 
+        # getting each loan
+        for loan in transUnionData:
+            
+            # setting the loans string to an intiger variable to add to the total months 
+            transUnionTotalMonthsInt = int(loan[1])
+
+            # Adding the total months intiger to the total months
+            transUnionTotalMonths += transUnionTotalMonthsInt
+
+            # if the loan is open
+            if loan[0] == 'OPEN':
+                
+                print(loan)
+
+                # if its an open loan we add it to the total amount of open loans
+                transUnionTotalOpenLoans += 1
+
+                # giving the loan payoff list a variable ['20300.0', '10800.0']
+                transUnionLoanPayoffList = loan[2]
+                
+
+                # checking each number in the list
+                currentLoanPayoffs = []
+                        
+                #translating the numbers so we can compare them to the numbers the bureau gives us
+                translatedForTransUnionNumbers = []
+
+                
+                for number in transUnionLoanPayoffList:
+                    
+                    #getting rid of the comma in with the first variable
+                    translatedLoanPayoff = number.replace(".0", "")
+
+                    #  comparing the first three numbers siince the rest are zeros
+                    translatedLoanPayoff1 = translatedLoanPayoff[0:3]
+
+                    #appending the translated numbers to the list
+                    currentLoanPayoffs.append(translatedLoanPayoff1)
+
+                
+                print(currentLoanPayoffs)
+                
+                
+                for num in translatedNums:
+
+                    # getting rid of the comma in with the first variable
+                    translatedNum = num.replace(",", "")
+
+                    # getting rid of the $ s we can turn it into an int later
+                    translatedNum1 = translatedNum.replace("$", "")
+                            
+                    # getting rid of the .00 with the second variable
+                    translatedNum2 = translatedNum1.replace(".00", "") 
+
+                    #  comparing the first three numbers since the rest are zeros
+                    translatedNum3 = translatedNum2[0:3]
+                            
+                    # appending the numbers to the list to be compared later
+                    translatedForTransUnionNumbers.append(translatedNum3)
+                
+                print(translatedForTransUnionNumbers)
+
+                
+                # checking the lists to see if they match without being revesed
+                if (int(translatedForTransUnionNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForTransUnionNumbers[1]) == int(currentLoanPayoffs[1])):
+
+                    # adding the months from ths loan to the total payments on current if they match this way
+                    currentLoanMonthsInt = loan[1]
+                    
+                    transUnionPaymentsOnCurent += int(currentLoanMonthsInt)
+
+                    print('this is the current loan matched without being reversed')
  
+                else:
+                                
+                    print('this isint a match')
 
+            
+
+            print(loan)
+        
+        print(transUnionTotalMonths)
+        print(transUnionTotalOpenLoans)
+        print(transUnionPaymentsOnCurent)
+        
+        # totalPaymentHistory, paymentsOnCurrent, openAutoLines
+        googleSheetNumberfilter(transUnionTotalMonths, transUnionPaymentsOnCurent, transUnionTotalOpenLoans)
+
+        
+    
+    
     elif s:
 
+        # the total count of the months on every auto loan 
+        totalLoanCount.append('24+')
+        
+        # the total number of open loans
+        totalOpenLoanCount.append("1")
+        
+        # The number of months on the current
+        currentLoanMonths.append("12+")
 
-        # the total count of the months on evry auto loan 
+
+        
+
+    elif q:
+
+        # the total count of the months on every auto loan 
         totalLoanCount.append('24+')
         
         # the total number of open loans
@@ -473,15 +637,13 @@ def getBureauData(drive):
 
 
 
-
-
     else: 
         
         
         print('not eqifax')
         returnedData = auto.get_nonequifax_auto_data(bureauData)
         
-        isBankruptcy.isBankruptcy(bureauData)
+        
 
         
         # variable to keep track of the total number of months

@@ -5,7 +5,8 @@ from dateutil import parser
 # Input: string of whole file
 # Output: (boolean, string)
 def isBankruptcy(text):
-    
+    global isBankrupt
+    global date
     isBankrupt = False
     date = ''
 
