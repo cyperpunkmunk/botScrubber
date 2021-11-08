@@ -9,6 +9,18 @@ import apphandler # file that reutuns our funcitons to get the data from our app
 import os
 from dotenv import load_dotenv
 
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import apphandler # file that reutuns our funcitons to get the data from our app
+import os
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+
+
 #getting our variables from the .env file
 load_dotenv()
 WEB_DRIVER_PATH = os.getenv('WEB_DRIVER_PATH')
@@ -58,3 +70,54 @@ jsfile = 'app/keys.json'
 spreadid = SPREAD_SHEET_ID
 
 apphandler.googleSheetfill(sco,jsfile,spreadid)
+
+
+payoff = 25520
+
+def expenseChecks(payoff):
+
+    # clicking on the expenses tab
+    expensesTab = drive.find_element(By.XPATH,'//*[@id="expenses"]')
+    expensesTab.click()
+
+    # uncheck first box
+    if payoff > 10000:
+
+        # getting each div from the boz that contains the payoffs 
+        payoffsList = drive.find_elements(By.CSS_SELECTOR , 'tr.ui-widget-content')
+
+        
+        i = 1
+        
+        for item in payoffsList:
+            
+            iToStr = str(i)
+            
+            
+            formatedSelector = '//*[@id=+"+"'+"iToStr"+'"+"+ ]/td[8]'
+
+            try:
+
+                se = item.find_element(By.XPATH,(formatedSelector))
+                print(se)
+            
+            except:
+
+                print(('cant find it'))
+
+        
+    
+
+
+
+
+
+    saveButton = drive.find_element(By.XPATH,'//*[@id="saveExpenses"]')
+    #saveButton.submit()
+
+
+
+
+    
+expenseChecks(payoff)
+

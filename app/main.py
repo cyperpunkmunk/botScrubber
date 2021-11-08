@@ -71,11 +71,11 @@ hiheiuru = '95366045' # new lendor 4
 efeguv = '95420633'# FILE FROZEN DUE TO FEDERAL LEGISLATION.
 oiwef = '95417554' # new lendor banckrupcty
 
-sasa = '95433188' # bug with '0' payment for one spot
+sasa = '95433188' # bug with '0' payment for one spot ##DONE
 asc = '95434300' # same bug ^
 
 
-cur3 = LOAN_URL + '95527725'
+cur3 = LOAN_URL + sasa
 
 cur4 = LOAN_URL + fgb
 #gets everything from decision page
