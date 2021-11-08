@@ -387,7 +387,10 @@ def getBureauData(drive):
             date = match.group(1)[34:44].strip()
 
             print(date)
-            # updates the first parameter in the loan info 
+            
+            #searching to see if there is an auto loan in the br
+            lum = re.search("BK7DISC" , text)
+            
 
         # standardize date formatting to MM/DD/YYYY
         if len(date) > 0:
@@ -395,6 +398,13 @@ def getBureauData(drive):
             date = parser.parse(date).strftime("%m/%d/%Y")
             
             translatedData(date)
+            
+            # i f there is a auto loan included in the br
+            if lum:
+                bankruptcyInfo[1] = "YES"
+            else:
+                bankruptcyInfo[1] = 'NO'
+
         
 
       
@@ -420,7 +430,9 @@ def getBureauData(drive):
 
     # if we get a frozen file error
     q = re.search("FREEZE ON CREDIT REPORT" , bureauData)
-        
+
+    # if we get file frozen due to federal legislation error
+    g = re.search("FILE FROZEN DUE TO FEDERAL LEGISLATION." , bureauData)
     
     ## transferable list for our spreadsheet to use when filling in data
     
@@ -492,12 +504,6 @@ def getBureauData(drive):
         print('this was made with equifax')
         returnedData = auto.get_equifax_auto_data(bureauData)
 
-
-        
-        
-        
-
-        # bankruptcy var if there is one
         
         # variable to keep track of the total number of months
         equifaxTotalMonths = 0
@@ -757,6 +763,8 @@ def getBureauData(drive):
         # The number of months on the current
         currentLoanMonths.append("12+")
 
+        print('credit bureau error')
+
 
         
 
@@ -770,9 +778,23 @@ def getBureauData(drive):
         
         # The number of months on the current
         currentLoanMonths.append("12+")
+
+        print('credit bureau error')
+    
+    
+    # if we get file frozen due to federal legislation error
+    elif g:
+
+        # the total count of the months on every auto loan 
+        totalLoanCount.append('24+')
         
+        # the total number of open loans
+        totalOpenLoanCount.append("1")
+        
+        # The number of months on the current
+        currentLoanMonths.append("12+")
 
-
+        print('credit bureau error')
 
 
     else: 

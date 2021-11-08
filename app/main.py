@@ -63,8 +63,8 @@ ssawe3 = '95111726' #nonequifax banckruptcy2
 fk = '95053557' # nonequifax banckuptcy
 fgb = '95218758' # non equifax banckruptcy 
 ch  = '95107790'# customer with duplicate application
-ewgfe = '95221261' # file locked t consumers request 
-egrc = '95239642' # credit bureau error
+ewgfe = '95221261' # file locked t consumers request ##DONE
+egrc = '95239642' # credit bureau error ## IFFY
 rurhr = '95266936' # new lendor 2
 rtgrt = '95308158'# new lendor 3
 hiheiuru = '95366045' # new lendor 4
@@ -75,7 +75,7 @@ sasa = '95433188' # bug with '0' payment for one spot
 asc = '95434300' # same bug ^
 
 
-cur3 = LOAN_URL + ssawe3
+cur3 = LOAN_URL + fgb
 
 cur4 = LOAN_URL + fgb
 #gets everything from decision page
@@ -88,7 +88,7 @@ apphandler.getBureauData(drive)
 
 #fills the data in for our spreadSheet
 
-#how we decide how our program interacts with the spreeadsheet
+#how we decide how our program interacts with the spreadsheet
 sco = ['https://www.googleapis.com/auth/spreadsheets']
 
 # refrence to our keys that allouw us to be able to acces the sheet with the google cloud account

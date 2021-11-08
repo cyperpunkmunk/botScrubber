@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+import time
 #getting our variables from the .env file
 load_dotenv()
 WEB_DRIVER_PATH = os.getenv('WEB_DRIVER_PATH')
@@ -37,7 +37,7 @@ apphandler.login(drive, HOME_URL, USERNAME_ENV, PASSWORD_ENV)
 
 
 
-cur3 = LOAN_URL + '94764207'
+cur3 = LOAN_URL + '95527725'
 
 
 #gets everything from decision page
@@ -45,15 +45,17 @@ apphandler.getAppData(cur3,drive)
 
 
 #ppq type variable 
-ppqVer = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[3]/tbody/tr[1]/td[1]/label').text
-    
+time.sleep(1)
+ppqVer = drive.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[3]/tbody/tr[1]/td[1]/label').text
+   
+time.sleep(1)   
 # apr rate variable
-aprRate = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').get_attribute('value')
+aprRate = '6.25%'
 
 
 def fillLoData(drive, ppqVer, aprRate):
 
-    # thep list of ppq variables when its ok to do a hard pull request
+    # the list of ppq variables when its ok to do a hard pull request
     needPpList = ['LENTREE' , 'MYAL' , 'MYAL2' , 'V&D', 'MTG-LENDER']
 
     print(ppqVer)
@@ -63,12 +65,12 @@ def fillLoData(drive, ppqVer, aprRate):
     drive.implicitly_wait(400)
     
     # how we get the button for the ppq table
-    ppqButton = Select(drive.find_element_by_xpath('//*[@id="528582"]'))
-    drive.implicitly_wait(400)
+    ppqButton = Select(drive.find_element(By.XPATH,'//*[@id="528582"]'))
+    time.sleep(1)
     
     # variable to change the value if it says 0.00%
-    aprRateText = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').text
-    drive.implicitly_wait(400)
+    aprRateText = drive.find_element(By.XPATH,'/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').text
+    time.sleep(1)
 
 
     def ppqCheck( variable , listOfNeedPP, button ):
@@ -86,35 +88,30 @@ def fillLoData(drive, ppqVer, aprRate):
     def aprCheck():
 
         # Variable to change the value if it says 0.00%
-        aprRateText = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').get_attribute('value')
+        aprRateText = drive.find_element(By.XPATH,'/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').get_attribute('value')
         
         drive.implicitly_wait(400)
         
         # Variable to change the number
-        #WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='522672']"))).send_keys('00.2')
-        aprRateChangeVar = drive.find_element_by_xpath('//*[@id="522672"]')
-        #tdBox = drive.find_element_by_xpath('//*[@id="decisioning"]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]')
+     
+        aprRateChangeVar = drive.find_element(By.ID,'522672')
+ 
 
         if aprRate == '0.00%':
 
           
-            #tdBox.click()
-            #drive.find_element_by_xpath('//*[@id="522672"]').send_keys('00.2')
-
-            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='522672']"))).send_keys('00.2')
-            drive.find_element_by_xpath('//*[@id="btnSave"]')
+      
+         
+            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.ID, '522672'))).clear()
+            time.sleep(.5)
+            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="522676"]' ))).send_keys('00.9')
+            drive.find_element(By.XPATH, '//*[@id="btnSave"]')
             print('need apr')
             
         
         else:
-
-    
-
             drive.implicitly_wait(400)
-            
-            # drive.find_element_by_xpath('//*[@id="522672"]').send_keys('00.2')
-            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='522672']"))).send_keys('00.2')
-            drive.find_element_by_xpath('//*[@id="btnSave"]')
+
             print('no apr')
 
             
@@ -134,7 +131,7 @@ def fillLoData(drive, ppqVer, aprRate):
     def loSelect(name):
 
         # How we get our lo selector button for the pop-up menu
-        loPopupButton = Select(drive.find_element_by_xpath('//*[@id="assignedOptions"]'))
+        loPopupButton = Select(drive.find_element(By.XPATH,'//*[@id="assignedOptions"]'))
         drive.implicitly_wait(400)
         ## Select assign option button
         loPopupButton.select_by_value("2")
@@ -142,26 +139,27 @@ def fillLoData(drive, ppqVer, aprRate):
 
 
         # Button to select lo officer
-        underwriterButtonVar = Select(drive.find_element_by_xpath('//*[@id="manageUserAssignment_modal"]/div/div[4]/div[2]/select'))
+        underwriterButtonVar = Select(drive.find_element(By.XPATH,'//*[@id="manageUserAssignment_modal"]/div/div[4]/div[2]/select'))
         underwriterButtonVar.select_by_visible_text(name)
         print('clicked on element')
 
 
         # Button to select CSA
-        CSAbuttonVar = Select(drive.find_element_by_xpath('//*[@id="manageUserAssignment_modal"]/div/div[7]/div[2]/select'))
+        CSAbuttonVar = Select(drive.find_element(By.XPATH,'//*[@id="manageUserAssignment_modal"]/div/div[7]/div[2]/select'))
         CSAbuttonVar.select_by_visible_text(name)
         print('clicked on second element')
 
 
         # Button click to save the assigned user
-        drive.find_element_by_xpath('//*[@id="btnSaveAssignments"]').click()
+        drive.find_element(By.XPATH,'//*[@id="btnSaveAssignments"]').click()
 
     
     # saving the data on our main page before we change pages
     def saveFilledDataMain():    
         
-        # Button to save everything on the main page (exccept for the saved approved lenders)
-        drive.find_element_by_xpath('//*[@id="btnSave"]')
+        # Button to save everything on the main page (except for the saved approved lenders)
+        saveButton = drive.find_element(By.XPATH,'//*[@id="btnSave"]')
+        saveButton.submit()
         print('saved page')
         
 
@@ -169,24 +167,20 @@ def fillLoData(drive, ppqVer, aprRate):
     
 
 
+    # Filling the form in to choose our user
+    loSelect(loName)
+    time.sleep(1)
+    
     # How we check the pp lender and fill the form depending on which one it is
     ppqCheck(ppqVer, needPpList, ppqButton)
 
-    drive.implicitly_wait(400)
 
+    time.sleep(1)
     # Checking and filling in our apr rate
     aprCheck()
     
-    drive.implicitly_wait(400)
 
-    
-
-    drive.implicitly_wait(400)
-
-    # Filling the form in to choose our user
-    loSelect(loName)
-
-    drive.implicitly_wait(400)
+    time.sleep(1)
 
     # Saving the data again
     saveFilledDataMain()
