@@ -340,9 +340,12 @@ def getBureauData(drive):
             else:
                 bankruptcyInfo[0] = "YES_Recent"
             
+            # updates the third parameter in the Br info
+            bankruptcyInfo[2] = "Discharged"
 
             # fills in the last listed date in the br info 
             bankruptcyInfo[3] = originalLone
+
 
 
             
@@ -372,9 +375,6 @@ def getBureauData(drive):
             translatedData(date)
 
 
-            # updates the third parameter in the Br info
-            bankruptcyInfo[2] = "Discharged"
-
             
 
         # Non Equifax:
@@ -386,13 +386,15 @@ def getBureauData(drive):
             match = neqRegex.search(text)
             date = match.group(1)[34:44].strip()
 
+            print(date)
             # updates the first parameter in the loan info 
-            translatedData(date)
 
-        
         # standardize date formatting to MM/DD/YYYY
         if len(date) > 0:
+            
             date = parser.parse(date).strftime("%m/%d/%Y")
+            
+            translatedData(date)
         
 
       
