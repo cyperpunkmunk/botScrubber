@@ -9,6 +9,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+
+'''
+
 #getting our variables from the .env file
 load_dotenv()
 WEB_DRIVER_PATH = os.getenv('WEB_DRIVER_PATH')
@@ -18,10 +21,10 @@ HOME_URL = os.getenv('HOME_URL')
 USERNAME_ENV = os.getenv('USERNAME_ENV')
 PASSWORD_ENV = os.getenv('PASSWORD_ENV')
 
-'''
+
 maintenence notes
 need to update chromedriver and link to google sheet when its changed
-'''
+
 
 
 # Webdriver options 
@@ -45,12 +48,13 @@ apphandler.getAppData(cur3,drive)
 
 
 #ppq type variable 
-time.sleep(1)
+
 ppqVer = drive.find_element(By.XPATH, '/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[3]/tbody/tr[1]/td[1]/label').text
    
-time.sleep(1)   
+   
 # apr rate variable
 aprRate = '6.25%'
+'''
 
 
 def fillLoData(drive, ppqVer, aprRate):
@@ -58,8 +62,7 @@ def fillLoData(drive, ppqVer, aprRate):
     # the list of ppq variables when its ok to do a hard pull request
     needPpList = ['LENTREE' , 'MYAL' , 'MYAL2' , 'V&D', 'MTG-LENDER']
 
-    print(ppqVer)
-    print(aprRate)
+    
 
     # use this to choose ppq depending on what it says
     drive.implicitly_wait(400)
@@ -188,7 +191,7 @@ def fillLoData(drive, ppqVer, aprRate):
     
 
 
-fillLoData(drive, ppqVer, aprRate)
+
   
 
   

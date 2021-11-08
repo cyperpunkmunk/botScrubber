@@ -13,13 +13,14 @@ import re
 from googleapiclient.discovery import build
 from selenium.webdriver.chrome.options import Options
 from google.oauth2 import service_account
-
+import time
 
 import extractDataTransunion
 
 from dateutil import parser
 from datetime import datetime
 
+import loanOffN4
 
 import auto
 
@@ -64,6 +65,9 @@ def getAppData(Url,drive):
     drive.find_element_by_xpath('//*[@id="dashboard-container"]/div/div[2]/a').click()
 
 
+
+
+
     drive.implicitly_wait(400)
 
     drive.get(Url)
@@ -72,6 +76,7 @@ def getAppData(Url,drive):
 
     drive.refresh()
     
+
     drive.implicitly_wait(400)
 
     print(currentPage)
@@ -111,7 +116,12 @@ def getAppData(Url,drive):
     dataText.append(originalLoanAmout)
     dataText.append(remainingbalance)
     
-  
+
+    time.sleep(1)
+
+    loanOffN4.fillLoData(drive, ppqVer, aprRate)
+    
+    time.sleep(1)
     
     # for when we need to translate our numbers
     def translateNums (loanAmount, remainingBal):
