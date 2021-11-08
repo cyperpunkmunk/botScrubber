@@ -18,6 +18,9 @@ from google.oauth2 import service_account
 import extractDataTransunion
 
 from dateutil import parser
+from datetime import datetime
+
+
 import auto
 
 
@@ -25,6 +28,21 @@ import auto
 # dataText 
 dataText = []
 
+# A date has day 'd', month 'm' and year 'y'
+class Date:
+    def __init__(self, d, m, y):
+        self.d = d
+        self.m = m
+        self.y = y
+ 
+# To store number of days in all months from
+# January to Dec.
+monthDays = [31, 28, 31, 30, 31, 30,
+             31, 31, 30, 31, 30, 31]
+
+
+
+             
 
 #loginfunciton
 def login(drive , homeUrl, username, password):
@@ -198,7 +216,7 @@ def getAppData(Url,drive):
     print(stateLong)
 
 
-    # county list for spreasheet function
+    # county list for spreadsheet function
     global countyTranslated
     countyTranslated = []
 
@@ -216,38 +234,7 @@ def getAppData(Url,drive):
     countyHandler()
     
     
-    # Checks file for "PUBLIC RECORD" section, and extracts the RPTD date.
-    # Input: string of whole file
-    # Output: (boolean, string)
-    def isBankruptcy(text):
-        global isBankrupt
-        global date
-        isBankrupt = False
-        date = ''
 
-        # Equifax:
-        eqRegex = re.compile(r'BKRPTCY-FILED:.*\n\s*RPTD:\s*([0-9,/]*)')
-        eqPR = 'PUBLIC RECORD INFORMATION'
-
-        if eqPR in text:
-            isBankrupt = True
-            match = eqRegex.search(text)
-            date = match.group(1)
-
-        # Non Equifax:
-        neqRegex = re.compile(r'PUBLIC RECORDS\s*-*\n(.*)\n')
-        neqPR = 'PUBLIC RECORDS'
-
-        if neqPR in text:
-            isBankrupt = True
-            match = neqRegex.search(text)
-            date = match.group(1)[34:44].strip()
-        
-        # standardize date formatting to MM/DD/YYYY
-        if len(date) > 0:
-            date = parser.parse(date).strftime("%m/%d/%Y")
-        
-        print(isBankrupt, date)
    
 
     
@@ -263,6 +250,10 @@ def getBureauData(drive):
 
     bureauData = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/div[3]/div[3]/span/div/pre').text
 
+
+    global bankruptcyInfo
+
+
     # bankruptcy,Br includes car, br status, Last Listed Date 
     bankruptcyInfo = ['NO_BR','N/A', 'N/A', '']
     
@@ -276,14 +267,115 @@ def getBureauData(drive):
         isBankrupt = False
         date = ''
 
+        
+        def countLeapYears(d):
+ 
+            years = d.y
+    
+            # Check if the current year needs to be considered
+            # for the count of leap years or not
+            if (d.m <= 2):
+                years -= 1
+    
+            # An year is a leap year if it is a multiple of 4,
+            # multiple of 400 and not a multiple of 100.
+            return int(years / 4) - int(years / 100) + int(years / 400)
+        
+            
+        # This function returns number of days between two
+        # given dates
+        def getDifference(dt1, dt2):
+
+            # COUNT TOTAL NUMBER OF DAYS BEFORE FIRST DATE 'dt1'   
+            # initialize count using years and day
+            n1 = dt1.y * 365 + dt1.d
+    
+            # Add days for months in given date
+            for i in range(0, dt1.m - 1):
+                n1 += monthDays[i]
+    
+            # Since every leap year is of 366 days,
+            # Add a day for every leap year
+            n1 += countLeapYears(dt1)
+    
+            # SIMILARLY, COUNT TOTAL NUMBER OF DAYS BEFORE 'dt2'
+        
+            n2 = dt2.y * 365 + dt2.d
+            for i in range(0, dt2.m - 1):
+                n2 += monthDays[i]
+            n2 += countLeapYears(dt2)
+        
+            # return difference between two counts
+            return (n2 - n1)
+    
+        
+        def translatedData(originalLone):
+            
+            
+            # returns a list [month, day, year]
+            translatedDate = originalLone.split("/")
+            
+            #  setting todays dat to a variable to use later
+            today = datetime.today()
+            # formatting the data to mm/dd/YYYY 
+            todayformated = today.strftime("%m/%d/%Y")
+            #sliptting each number by the / to form a list to be able to fill for the dt1 variable
+            currentDate = todayformated.split("/")
+            
+            # variables to see the dates we get back
+            d1 = int(currentDate[0]),int(currentDate[1]),int(currentDate[2])
+            d2 = int(translatedDate[1]), int(translatedDate[0]) ,int(translatedDate[2])
+
+            # day, month, year
+            dt1 = Date(int(translatedDate[1]), int(translatedDate[0]) ,int(translatedDate[2]))
+            dt2 = Date(int(currentDate[0]),int(currentDate[1]),int(currentDate[2]))
+
+            # difference of the two dates as a variable
+            datesSubtracted = getDifference(dt1, dt2)
+
+            # if the difference is greater than or equal to 4 years (1460 days) 
+            if datesSubtracted >= 1460:
+                bankruptcyInfo[0] = "YES_4_plus_years_ago"
+            #if its less than four years
+            else:
+                bankruptcyInfo[0] = "YES_Recent"
+            
+
+            # fills in the last listed date in the br info 
+            bankruptcyInfo[3] = originalLone
+
+
+            
+            
+            print(translatedDate)
+            print(d1)
+            print(d2)
+            print(datesSubtracted)
+
+
+            
+        
+        
+        
+        
         # Equifax:
         eqRegex = re.compile(r'BKRPTCY-FILED:.*\n\s*RPTD:\s*([0-9,/]*)')
         eqPR = 'PUBLIC RECORD INFORMATION'
 
         if eqPR in text:
+            
             isBankrupt = True
             match = eqRegex.search(text)
             date = match.group(1)
+            
+            # updates the first parameter in the loan info 
+            translatedData(date)
+
+
+            # updates the third parameter in the Br info
+            bankruptcyInfo[2] = "Discharged"
+
+            
 
         # Non Equifax:
         neqRegex = re.compile(r'PUBLIC RECORDS\s*-*\n(.*)\n')
@@ -293,11 +385,18 @@ def getBureauData(drive):
             isBankrupt = True
             match = neqRegex.search(text)
             date = match.group(1)[34:44].strip()
+
+            # updates the first parameter in the loan info 
+            translatedData(date)
+
         
         # standardize date formatting to MM/DD/YYYY
         if len(date) > 0:
             date = parser.parse(date).strftime("%m/%d/%Y")
         
+
+      
+
         print(isBankrupt, date)
 
 
@@ -891,6 +990,18 @@ def googleSheetfill(scopesNew,jsonFile,sheetId):
     
     countyFill = sheet.values().update(spreadsheetId = sheetId,
                             range="Sheet4!A4", valueInputOption="USER_ENTERED", body={"values": [[countyTranslated[0]]]}).execute()
+
+    bankruptcySelector = sheet.values().update(spreadsheetId = sheetId,
+                            range="Sheet4!G3", valueInputOption="USER_ENTERED", body={"values": [[bankruptcyInfo[0]]]}).execute()
+    
+    brIncludesCar = sheet.values().update(spreadsheetId = sheetId,
+                            range="Sheet4!G5", valueInputOption="USER_ENTERED", body={"values": [[bankruptcyInfo[1]]]}).execute()
+
+    brStatus = sheet.values().update(spreadsheetId = sheetId,
+                            range="Sheet4!H5", valueInputOption="USER_ENTERED", body={"values": [[bankruptcyInfo[2]]]}).execute()
+    
+    lastListedDate = sheet.values().update(spreadsheetId = sheetId,
+                            range="Sheet4!I5", valueInputOption="USER_ENTERED", body={"values": [[bankruptcyInfo[3]]]}).execute()
 
 
    

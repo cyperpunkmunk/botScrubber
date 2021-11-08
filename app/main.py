@@ -17,7 +17,7 @@ USERNAME_ENV = os.getenv('USERNAME_ENV')
 PASSWORD_ENV = os.getenv('PASSWORD_ENV')
 
 '''
-maintenence notes
+maintenance notes
 need to update chromedriver and link to google sheet when its changed
 '''
 
@@ -46,10 +46,10 @@ cur2 = '92198511' # equifax example2
 esta = '92812254' # est pay 0 ex 
 equiopen = "92852575" # matching errors for non equifax
 eqiuMix = '92885113'
-payoffError1 = '93131657'
-newOne = "94177038" # this one has a payments on current of 0
-newlendor ='94245265'
-bureauError = '94279712'# all 3 bureeauus give back and error
+payoffError1 = '93131657' ## DONE
+newOne = "94177038" # this one has a payments on current of 0 # URGENT!!!
+newlendor ='94245265' ## DONE
+bureauError = '94279712'# all 3 bureaus give back and error
 y = '94375737'
 dd = '94398438' #bureau error
 sd = '94406353' # bureau error consumer file locked
@@ -75,7 +75,8 @@ sasa = '95433188' # bug with '0' payment for one spot
 asc = '95434300' # same bug ^
 
 
-cur3 = LOAN_URL + '95520437'
+cur3 = LOAN_URL + newlendor
+
 cur4 = LOAN_URL + fgb
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
@@ -97,6 +98,5 @@ jsfile = 'app/keys.json'
 spreadid = SPREAD_SHEET_ID
 
 apphandler.googleSheetfill(sco,jsfile,spreadid)
-
 
 
