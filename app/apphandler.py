@@ -597,46 +597,58 @@ def getBureauData(drive):
                             # appending the numbers to the list to be compared later
                             translatedForEquifaxNumbers.append(translatedNum2)
 
-                        # checking the lists to see if they match without being reversed
-                        if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
 
-                            # adding the months from ths loan to the total payments on current if they match this way
-                            equifaxPaymentsOnCurrent += int(cmd[1])
+                        try:
+                            # checking the lists to see if they match without being reversed
+                            if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
 
-                            print('this is the current loan matched without being reversed')
-                            
-                            break
+                                # adding the months from ths loan to the total payments on current if they match this way
+                                equifaxPaymentsOnCurrent += int(cmd[1])
 
-                        elif (int(translatedForEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
-
-                            equifaxPaymentsOnCurrent += int(cmd[1])
-
-                            print('this is the current loan matched without being reversed')
-
-                            break   
+                                print('this is the current loan matched without being reversed')
+                                
+                                break                        
                         
-                        # checking to see if they match while being reversed
-                        elif (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[1])):
-                            
-                            # adding the months from ths loan to the total payments on current if they match this way
-                            equifaxPaymentsOnCurrent += int(cmd[1])
+                        except:
+                            print("not a match")
 
-                            print('these numbers matched reversed')
-                            
-                            break
+                        try:
+                            if (int(translatedForEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
 
-                        elif(int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
+                                equifaxPaymentsOnCurrent += int(cmd[1])
 
-                            # adding the months from ths loan to the total payments on current if they match this way
-                            equifaxPaymentsOnCurrent += int(cmd[1])
+                                print('this is the current loan matched without being reversed')
 
-                            print('these numbers matched reversed')
-                            
-                            break
-                            
+                                break   
+                        except:
+                            print('not a match')
+                        
+                        try:
+                            # checking to see if they match while being reversed
+                            if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[1])):
+                                
+                                # adding the months from ths loan to the total payments on current if they match this way
+                                equifaxPaymentsOnCurrent += int(cmd[1])
+
+                                print('these numbers matched reversed')
+                                
+                                break
+                        except:
+                            print('not a match')
+                        
+                        try:
+                            if(int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
+
+                                # adding the months from ths loan to the total payments on current if they match this way
+                                equifaxPaymentsOnCurrent += int(cmd[1])
+
+                                print('these numbers matched reversed')
+                                
+                                break
+                        except:
+                            print('not a match')
                             
                         else:
-                            
                             print('this isint a match')
                                 
                                

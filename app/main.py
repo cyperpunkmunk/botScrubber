@@ -75,7 +75,7 @@ sasa = '95433188' # bug with '0' payment for one spot ##DONE
 asc = '95434300' # same bug ^
 
 
-cur3 = LOAN_URL + sasa
+cur3 = LOAN_URL + ssa
 
 cur4 = LOAN_URL + fgb
 #gets everything from decision page
