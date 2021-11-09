@@ -92,7 +92,7 @@ def expenseChecks(payoff):
                 
                 hi = "hi"
 
-                se = item.find_element(By.XPATH, "//*[@id="1"]/td[8]")
+                se = item.find_element(By.XPATH, "//*[@id='+name+']/td[8]")
                 print(se)
             
             except:

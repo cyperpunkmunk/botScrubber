@@ -6,6 +6,11 @@ from google.oauth2 import service_account
 import apphandler # file that reutuns our funcitons to get the data from our app
 import os
 from dotenv import load_dotenv
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 
 #getting our variables from the .env file
 load_dotenv()
@@ -31,7 +36,7 @@ drive = webdriver.Chrome(options=opts, executable_path=WEB_DRIVER_PATH)
 
 
 
-#logs in to homepage
+#logs in to homepage and brings you to the apps page
 apphandler.login(drive, HOME_URL, USERNAME_ENV, PASSWORD_ENV)
 
 
@@ -74,8 +79,10 @@ oiwef = '95417554' # new lendor banckrupcty
 sasa = '95433188' # bug with '0' payment for one spot ##DONE
 asc = '95434300' # same bug ^
 
+ads = '95542385' #saves mess up for loinfo
+sdfsa = '95546850' # new lender weird stuff
 
-cur3 = LOAN_URL + ssa
+cur3 = LOAN_URL + '95591885'
 
 cur4 = LOAN_URL + fgb
 #gets everything from decision page
@@ -98,5 +105,9 @@ jsfile = 'app/keys.json'
 spreadid = SPREAD_SHEET_ID
 
 apphandler.googleSheetfill(sco,jsfile,spreadid)
+
+drive.find_element(By.XPATH, '//*[@id="decision"]').click()
+
+drive.find_element(By.XPATH, '//*[@id="btnSave"]').click()
 
 

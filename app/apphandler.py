@@ -54,17 +54,15 @@ def login(drive , homeUrl, username, password):
     drive.find_element_by_xpath('//*[@id="password"]').send_keys(password)
     drive.find_element_by_xpath('//*[@id="submit-button"]').click()
     print('login successful')
-
-
-
-
-def getAppData(Url,drive):
-
+    
     drive.implicitly_wait(200)
 
     drive.find_element_by_xpath('//*[@id="dashboard-container"]/div/div[2]/a').click()
 
 
+
+
+def getAppData(Url,drive):
 
 
 
@@ -962,6 +960,8 @@ def getBureauData(drive):
         print(totalLoanCount)
         print(totalOpenLoanCount)
         print(currentLoanMonths)
+        
+    
 
         
 

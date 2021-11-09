@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 import time
 
 '''
@@ -70,7 +71,8 @@ def fillLoData(drive, ppqVer, aprRate):
     # how we get the button for the ppq table
     ppqButton = Select(drive.find_element(By.XPATH,'//*[@id="528582"]'))
     time.sleep(1)
-    
+
+
     # variable to change the value if it says 0.00%
     aprRateText = drive.find_element(By.XPATH,'/html/body/div[1]/div[3]/div/div/div/div/div/div/form/div[1]/table[1]/tbody/tr/td[1]/table[4]/tbody/tr[3]/td[2]/input').text
     time.sleep(1)
@@ -80,12 +82,16 @@ def fillLoData(drive, ppqVer, aprRate):
         
         # if our pp name is in the list of items that need pp
         if variable in listOfNeedPP:
-            button.select_by_value('NEED PP')
+            ppqButton.select_by_value('NEED PP')
             print('need pp')
+            time.sleep(.5)
+            drive.find_element(By.XPATH, '//*[@id="btnSave"]').click()
         
         else:
-            button.select_by_value('YES')
+            ppqButton.select_by_value('YES')
             print('yes')
+            time.sleep(.5)
+            drive.find_element(By.XPATH, '//*[@id="btnSave"]').click()
 
     
     def aprCheck():
@@ -103,12 +109,20 @@ def fillLoData(drive, ppqVer, aprRate):
         if aprRate == '0.00%':
 
           
-      
+            subButton = drive.find_element(By.XPATH, '//*[@id="btnSave"]')
          
             WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.ID, '522672'))).clear()
-            time.sleep(.5)
-            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="522676"]' ))).send_keys('00.9')
-            drive.find_element(By.XPATH, '//*[@id="btnSave"]')
+            subButton.submit()
+            
+            subButton = drive.find_element(By.XPATH, '//*[@id="btnSave"]')
+            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="522676"]' ))).send_keys(Keys.DELETE)
+            
+            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="522676"]' ))).send_keys("9")
+            
+            
+            
+            subButton.submit()
+            
             print('need apr')
             
         
@@ -162,6 +176,9 @@ def fillLoData(drive, ppqVer, aprRate):
         
         # Button to save everything on the main page (except for the saved approved lenders)
         saveButton = drive.find_element(By.XPATH,'//*[@id="btnSave"]')
+        saveButton.click()
+        time.sleep(1)
+
         saveButton.submit()
         print('saved page')
         
@@ -187,6 +204,8 @@ def fillLoData(drive, ppqVer, aprRate):
 
     # Saving the data again
     saveFilledDataMain()
+
+    drive.refresh()
     
     
 
