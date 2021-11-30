@@ -77,12 +77,14 @@ efeguv = '95420633'# FILE FROZEN DUE TO FEDERAL LEGISLATION.
 oiwef = '95417554' # new lendor banckrupcty
 
 sasa = '95433188' # bug with '0' payment for one spot ##DONE
-asc = '95434300' # same bug ^
+asc = '95434300' # same bug ^ 
 
 ads = '95542385' #saves mess up for loinfo
 sdfsa = '95546850' # new lender weird stuff
 
-cur3 = LOAN_URL + '95591885'
+weh = '95615520' # NO RECORD FOUND 
+
+cur3 = LOAN_URL + '96505722'
 
 cur4 = LOAN_URL + fgb
 #gets everything from decision page
