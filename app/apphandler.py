@@ -115,11 +115,11 @@ def getAppData(Url,drive):
     dataText.append(remainingbalance)
     
 
-    time.sleep(1)
+    
 
     loanOffN4.fillLoData(drive, ppqVer, aprRate)
     
-    time.sleep(1)
+    
     
     # for when we need to translate our numbers
     def translateNums (loanAmount, remainingBal):
@@ -247,740 +247,725 @@ def getAppData(Url,drive):
 
     
 
+try:
+    def getBureauData(drive):
 
-def getBureauData(drive):
-
-    drive.implicitly_wait(400)
-    
-    drive.find_element_by_xpath('//*[@id="bureau"]').click()
-
-    drive.implicitly_wait(400)
-
-    bureauData = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/div[3]/div[3]/span/div/pre').text
-
-
-    global bankruptcyInfo
-
-
-    # bankruptcy,Br includes car, br status, Last Listed Date 
-    bankruptcyInfo = ['NO_BR','N/A', 'N/A', '']
-    
-
-    # Checks file for "PUBLIC RECORD" section, and extracts the RPTD date.
-    # Input: string of whole file
-    # Output: (boolean, string)
-    def isBankruptcy(text):
-        global isBankrupt
-        global date
-        isBankrupt = False
-        date = ''
-
+        drive.implicitly_wait(400)
         
-        def countLeapYears(d):
- 
-            years = d.y
+        drive.find_element_by_xpath('//*[@id="bureau"]').click()
+
+        drive.implicitly_wait(400)
+
+        bureauData = drive.find_element_by_xpath('/html/body/div[1]/div[3]/div/div/div/div/div/div/div[3]/div[3]/span/div/pre').text
+
+
+        global bankruptcyInfo
+
+
+        # bankruptcy,Br includes car, br status, Last Listed Date 
+        bankruptcyInfo = ['NO_BR','N/A', 'N/A', '']
+        
+
+        # Checks file for "PUBLIC RECORD" section, and extracts the RPTD date.
+        # Input: string of whole file
+        # Output: (boolean, string)
+        def isBankruptcy(text):
+            global isBankrupt
+            global date
+            isBankrupt = False
+            date = ''
+
+            
+            def countLeapYears(d):
     
-            # Check if the current year needs to be considered
-            # for the count of leap years or not
-            if (d.m <= 2):
-                years -= 1
-    
-            # An year is a leap year if it is a multiple of 4,
-            # multiple of 400 and not a multiple of 100.
-            return int(years / 4) - int(years / 100) + int(years / 400)
+                years = d.y
+        
+                # Check if the current year needs to be considered
+                # for the count of leap years or not
+                if (d.m <= 2):
+                    years -= 1
+        
+                # An year is a leap year if it is a multiple of 4,
+                # multiple of 400 and not a multiple of 100.
+                return int(years / 4) - int(years / 100) + int(years / 400)
+            
+                
+            # This function returns number of days between two
+            # given dates
+            def getDifference(dt1, dt2):
+
+                # COUNT TOTAL NUMBER OF DAYS BEFORE FIRST DATE 'dt1'   
+                # initialize count using years and day
+                n1 = dt1.y * 365 + dt1.d
+        
+                # Add days for months in given date
+                for i in range(0, dt1.m - 1):
+                    n1 += monthDays[i]
+        
+                # Since every leap year is of 366 days,
+                # Add a day for every leap year
+                n1 += countLeapYears(dt1)
+        
+                # SIMILARLY, COUNT TOTAL NUMBER OF DAYS BEFORE 'dt2'
+            
+                n2 = dt2.y * 365 + dt2.d
+                for i in range(0, dt2.m - 1):
+                    n2 += monthDays[i]
+                n2 += countLeapYears(dt2)
+            
+                # return difference between two counts
+                return (n2 - n1)
         
             
-        # This function returns number of days between two
-        # given dates
-        def getDifference(dt1, dt2):
+            def translatedData(originalLone):
+                
+                
+                # returns a list [month, day, year]
+                translatedDate = originalLone.split("/")
+                
+                #  setting todays dat to a variable to use later
+                today = datetime.today()
+                # formatting the data to mm/dd/YYYY 
+                todayformated = today.strftime("%m/%d/%Y")
+                #sliptting each number by the / to form a list to be able to fill for the dt1 variable
+                currentDate = todayformated.split("/")
+                
+                # variables to see the dates we get back
+                d1 = int(currentDate[0]),int(currentDate[1]),int(currentDate[2])
+                d2 = int(translatedDate[1]), int(translatedDate[0]) ,int(translatedDate[2])
 
-            # COUNT TOTAL NUMBER OF DAYS BEFORE FIRST DATE 'dt1'   
-            # initialize count using years and day
-            n1 = dt1.y * 365 + dt1.d
-    
-            # Add days for months in given date
-            for i in range(0, dt1.m - 1):
-                n1 += monthDays[i]
-    
-            # Since every leap year is of 366 days,
-            # Add a day for every leap year
-            n1 += countLeapYears(dt1)
-    
-            # SIMILARLY, COUNT TOTAL NUMBER OF DAYS BEFORE 'dt2'
+                # day, month, year
+                dt1 = Date(int(translatedDate[1]), int(translatedDate[0]) ,int(translatedDate[2]))
+                dt2 = Date(int(currentDate[0]),int(currentDate[1]),int(currentDate[2]))
+
+                # difference of the two dates as a variable
+                datesSubtracted = getDifference(dt1, dt2)
+
+                # if the difference is greater than or equal to 4 years (1460 days) 
+                if datesSubtracted >= 1460:
+                    bankruptcyInfo[0] = "YES_4_plus_years_ago"
+                #if its less than four years
+                else:
+                    bankruptcyInfo[0] = "YES_Recent"
+                
+                # updates the third parameter in the Br info
+                bankruptcyInfo[2] = "Discharged"
+
+                # fills in the last listed date in the br info 
+                bankruptcyInfo[3] = originalLone
+
+
+
+                
+                
+                print(translatedDate)
+                print(d1)
+                print(d2)
+                print(datesSubtracted)
+
+
+                
+            
+            
+            
+            
+            # Equifax:
+            eqRegex = re.compile(r'BKRPTCY-FILED:.*\n\s*RPTD:\s*([0-9,/]*)')
+            eqPR = 'PUBLIC RECORD INFORMATION'
+
+            if eqPR in text:
+                
+                isBankrupt = True
+                match = eqRegex.search(text)
+                date = match.group(1)
+                
+                # updates the first parameter in the loan info 
+                translatedData(date)
+
+
+                
+
+            # Non Equifax:
+            neqRegex = re.compile(r'PUBLIC RECORDS\s*-*\n(.*)\n')
+            neqPR = 'PUBLIC RECORDS'
+
+            if neqPR in text:
+                isBankrupt = True
+                match = neqRegex.search(text)
+                date = match.group(1)[34:44].strip()
+
+                print(date)
+                
+
+            # standardize date formatting to MM/DD/YYYY
+            if len(date) > 0:
+                
+                date = parser.parse(date).strftime("%m/%d/%Y")
+                
+                translatedData(date)
+                
+                #searching to see if there is an auto loan in the br
+                lum = re.search("BK7DISC" , text)
+                
+                # i f there is a auto loan included in the br
+                if lum:
+                    bankruptcyInfo[1] = "YES"
+                else:
+                    bankruptcyInfo[1] = 'NO'
+
+            
+
         
-            n2 = dt2.y * 365 + dt2.d
-            for i in range(0, dt2.m - 1):
-                n2 += monthDays[i]
-            n2 += countLeapYears(dt2)
+
+            print(isBankrupt, date)
+
+
+
+        # returns true and the date of the bankruptcy if there is one
+        isBankruptcy(bureauData)
+
+
         
-            # return difference between two counts
-            return (n2 - n1)
-    
+
+
+
+
+        x = re.search("THIS FORM PRODUCED BY EQUIFAX" , bureauData)
+        y = re.search("TRANSUNION CREDIT REPORT" , bureauData)
+
+        # if we get a locked at consumers request error
+        s = re.search("FILE LOCKED AT CONSUMERS REQUEST", bureauData)
+
+        # if we get a frozen file error
+        q = re.search("FREEZE ON CREDIT REPORT" , bureauData)
+
+        # if we get file frozen due to federal legislation error
+        g = re.search("FILE FROZEN DUE TO FEDERAL LEGISLATION." , bureauData)
         
-        def translatedData(originalLone):
-            
-            
-            # returns a list [month, day, year]
-            translatedDate = originalLone.split("/")
-            
-            #  setting todays dat to a variable to use later
-            today = datetime.today()
-            # formatting the data to mm/dd/YYYY 
-            todayformated = today.strftime("%m/%d/%Y")
-            #sliptting each number by the / to form a list to be able to fill for the dt1 variable
-            currentDate = todayformated.split("/")
-            
-            # variables to see the dates we get back
-            d1 = int(currentDate[0]),int(currentDate[1]),int(currentDate[2])
-            d2 = int(translatedDate[1]), int(translatedDate[0]) ,int(translatedDate[2])
+        ## transferable list for our spreadsheet to use when filling in data
+        
+        # the total count of the months on every auto loan 
+        global totalLoanCount
+        totalLoanCount = []
+        # the total number of open loans
+        global totalOpenLoanCount
+        totalOpenLoanCount = []
+        # The number of months on the current
+        global currentLoanMonths
+        currentLoanMonths = []
 
-            # day, month, year
-            dt1 = Date(int(translatedDate[1]), int(translatedDate[0]) ,int(translatedDate[2]))
-            dt2 = Date(int(currentDate[0]),int(currentDate[1]),int(currentDate[2]))
-
-            # difference of the two dates as a variable
-            datesSubtracted = getDifference(dt1, dt2)
-
-            # if the difference is greater than or equal to 4 years (1460 days) 
-            if datesSubtracted >= 1460:
-                bankruptcyInfo[0] = "YES_4_plus_years_ago"
-            #if its less than four years
+        
+        
+        # function to scale the numbers down for the google sheet
+        def googleSheetNumberfilter(totalPaymentHistory, paymentsOnCurrent, openAutoLines):
+                
+            # if our numbers are over or equal to 24
+            if totalPaymentHistory >= 24:
+                    
+                # change the total number to 24+ since thats the max the spreadsheet takes 
+                totalPaymentHistory = '24+'
+                totalLoanCount.append(totalPaymentHistory)
+                
             else:
-                bankruptcyInfo[0] = "YES_Recent"
-            
-            # updates the third parameter in the Br info
-            bankruptcyInfo[2] = "Discharged"
+                # if its less than 12 we just turn it it to a readable string for the spreadsheet
+                totalPaymentHistoryString = str(totalPaymentHistory)
+                totalLoanCount.append(totalPaymentHistoryString)
 
-            # fills in the last listed date in the br info 
-            bankruptcyInfo[3] = originalLone
-
-
-
-            
-            
-            print(translatedDate)
-            print(d1)
-            print(d2)
-            print(datesSubtracted)
-
-
-            
-        
-        
-        
-        
-        # Equifax:
-        eqRegex = re.compile(r'BKRPTCY-FILED:.*\n\s*RPTD:\s*([0-9,/]*)')
-        eqPR = 'PUBLIC RECORD INFORMATION'
-
-        if eqPR in text:
-            
-            isBankrupt = True
-            match = eqRegex.search(text)
-            date = match.group(1)
-            
-            # updates the first parameter in the loan info 
-            translatedData(date)
-
-
-            
-
-        # Non Equifax:
-        neqRegex = re.compile(r'PUBLIC RECORDS\s*-*\n(.*)\n')
-        neqPR = 'PUBLIC RECORDS'
-
-        if neqPR in text:
-            isBankrupt = True
-            match = neqRegex.search(text)
-            date = match.group(1)[34:44].strip()
-
-            print(date)
-            
-
-        # standardize date formatting to MM/DD/YYYY
-        if len(date) > 0:
-            
-            date = parser.parse(date).strftime("%m/%d/%Y")
-            
-            translatedData(date)
-            
-            #searching to see if there is an auto loan in the br
-            lum = re.search("BK7DISC" , text)
-            
-            # i f there is a auto loan included in the br
-            if lum:
-                bankruptcyInfo[1] = "YES"
+                
+                
+            # if our numbers are over or equal to 12
+            if paymentsOnCurrent >= 12:
+                    
+                # change the total number to 12+ since thats the max the spreadsheet takes 
+                paymentsOnCurrent = '12+'
+                currentLoanMonths.append(paymentsOnCurrent)
+                
             else:
-                bankruptcyInfo[1] = 'NO'
-
-        
-
-      
-
-        print(isBankrupt, date)
-
-
-
-    # returns true and the date of the bankruptcy if there is one
-    isBankruptcy(bureauData)
-
-
-    
-
-
-
-
-    x = re.search("THIS FORM PRODUCED BY EQUIFAX" , bureauData)
-    y = re.search("TRANSUNION CREDIT REPORT" , bureauData)
-
-    # if we get a locked at consumers request error
-    s = re.search("FILE LOCKED AT CONSUMERS REQUEST", bureauData)
-
-    # if we get a frozen file error
-    q = re.search("FREEZE ON CREDIT REPORT" , bureauData)
-
-    # if we get file frozen due to federal legislation error
-    g = re.search("FILE FROZEN DUE TO FEDERAL LEGISLATION." , bureauData)
-    
-    ## transferable list for our spreadsheet to use when filling in data
-    
-    # the total count of the months on every auto loan 
-    global totalLoanCount
-    totalLoanCount = []
-    # the total number of open loans
-    global totalOpenLoanCount
-    totalOpenLoanCount = []
-    # The number of months on the current
-    global currentLoanMonths
-    currentLoanMonths = []
-
-    
-    
-    # function to scale the numbers down for the google sheet
-    def googleSheetNumberfilter(totalPaymentHistory, paymentsOnCurrent, openAutoLines):
-            
-        # if our numbers are over or equal to 24
-        if totalPaymentHistory >= 24:
+                # if its less than 12 we just turn it it to a readable string for the spreadsheet
+                paymentsOnCurrentString = str(paymentsOnCurrent)
+                currentLoanMonths.append(paymentsOnCurrentString)
+                    
                 
-            # change the total number to 24+ since thats the max the spreadsheet takes 
-            totalPaymentHistory = '24+'
-            totalLoanCount.append(totalPaymentHistory)
-            
-        else:
-            # if its less than 12 we just turn it it to a readable string for the spreadsheet
-            totalPaymentHistoryString = str(totalPaymentHistory)
-            totalLoanCount.append(totalPaymentHistoryString)
-
-            
-            
-        # if our numbers are over or equal to 12
-        if paymentsOnCurrent >= 12:
                 
-            # change the total number to 12+ since thats the max the spreadsheet takes 
-            paymentsOnCurrent = '12+'
-            currentLoanMonths.append(paymentsOnCurrent)
-            
-        else:
-            # if its less than 12 we just turn it it to a readable string for the spreadsheet
-            paymentsOnCurrentString = str(paymentsOnCurrent)
-            currentLoanMonths.append(paymentsOnCurrentString)
+            # if our numbers are over or equal to 5
+            if openAutoLines >= 5:
+                    
+                # change the total number to 5+ since thats the max the spreadsheet takes 
+                openAutoLines = '5+'
+                totalOpenLoanCount.append(openAutoLines)
                 
-            
-            
-        # if our numbers are over or equal to 5
-        if openAutoLines >= 5:
-                
-            # change the total number to 5+ since thats the max the spreadsheet takes 
-            openAutoLines = '5+'
-            totalOpenLoanCount.append(openAutoLines)
-            
-        else:
-            # if its less than 12 we just turn it it to a readable string for the spreadsheet
-            paymentsOnCurrentString = str(openAutoLines)
-            totalOpenLoanCount.append(paymentsOnCurrentString)
-
-
-
-    
-    # bankruptcy var if there isint one
-        
-
-    
-        
-    if x:
-
-        print('this was made with equifax')
-        returnedData = auto.get_equifax_auto_data(bureauData)
-
-        
-        # variable to keep track of the total number of months
-        equifaxTotalMonths = 0
-
-        # variable to keep track of total open loans
-        equifaxTotalOpenLoans = 0
-
-        # variable to keep track of number of payments on current loan
-        equifaxPaymentsOnCurrent = 0
-
-
-
-        # getting each loan
-        for loan in returnedData:
-            
-            # giving each loan a variable to be able to store its data
-            cmd = loan['status'], loan['months'], loan["prices"]
-            
-            if cmd[0] == "N/A":
-                print('LOAN WITH INVALID STATUS')
-            
             else:
-                # if th staus is valid then it checks to see if the months are valid
-                if cmd[1] == "N/A":
-                    print('LOAN WITH INVALID MONTHS')
+                # if its less than 12 we just turn it it to a readable string for the spreadsheet
+                paymentsOnCurrentString = str(openAutoLines)
+                totalOpenLoanCount.append(paymentsOnCurrentString)
+
+
+
+        
+        # bankruptcy var if there isint one
+            
+
+        
+            
+        if x:
+
+            print('this was made with equifax')
+            returnedData = auto.get_equifax_auto_data(bureauData)
+
+            
+            # variable to keep track of the total number of months
+            equifaxTotalMonths = 0
+
+            # variable to keep track of total open loans
+            equifaxTotalOpenLoans = 0
+
+            # variable to keep track of number of payments on current loan
+            equifaxPaymentsOnCurrent = 0
+
+
+
+            # getting each loan
+            for loan in returnedData:
+                
+                # giving each loan a variable to be able to store its data
+                cmd = loan['status'], loan['months'], loan["prices"]
+                
+                if cmd[0] == "N/A":
+                    print('LOAN WITH INVALID STATUS')
                 
                 else:
+                    # if th staus is valid then it checks to see if the months are valid
+                    if cmd[1] == "N/A":
+                        print('LOAN WITH INVALID MONTHS')
                     
+                    else:
+                        
+                        # turning each months from loan into and intiger to use later 
+                        equifaxMonthsStrToInt = int(cmd[1])
+                        # adding each loan months to the total months loan 
+                        equifaxTotalMonths += equifaxMonthsStrToInt
+
+                        # checking to see if it is an open or closed loan
+                        if cmd[0] == "OPEN":
+                            
+                            # if its an open loan we add it to the total amount of open loans
+                            equifaxTotalOpenLoans += 1
+
+                            # giving the loan payoff list a variable
+                            equifaxLoanPayoff = (cmd[2])
+                            
+                            # checking each number in the list
+                            currentLoanPayoffs = []
+                            
+                            #translating the numbers so we can compare them to the numbers the bureau gives us
+                            translatedForEquifaxNumbers = []
+
+                            # getting the number from this loan and putting them into a list to compare to the payoff numbers on the app 
+                            for number in equifaxLoanPayoff:
+                                
+                                # if the loan gives back a special case of a value with 0
+                                if number == '$':
+                                    
+                                    # filling the empty value with 0
+                                    numTranslated = number.replace('$', "0")
+
+                                    # appending to the list
+                                    currentLoanPayoffs.append(numTranslated)
+                                
+                                else:
+                                    # translating the numbers to match later
+                                    numTranslated = number.replace('$', "")
+                                    
+                                    # appending to the list
+                                    currentLoanPayoffs.append(numTranslated)
+                            
+                            # getting each number from the translated numbers var to compare them to the data in a new list with the numbers that are translated for equifax
+                            for num in translatedNums:
+                                
+
+                                #getting rid of the comma in with the first variable
+                                translatedNum = num.replace(",", "")
+
+                                # getting rid of the $ s we can turn it into an int later
+                                translatedNum1 = translatedNum.replace("$", "")
+                                
+                                # getting rid of the .00 with the second variable
+                                translatedNum2 = translatedNum1.replace(".00", "") 
+                                
+                                # appending the numbers to the list to be compared later
+                                translatedForEquifaxNumbers.append(translatedNum2)
+
+
+                            try:
+                                # checking the lists to see if they match without being reversed
+                                if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
+
+                                    # adding the months from ths loan to the total payments on current if they match this way
+                                    equifaxPaymentsOnCurrent += int(cmd[1])
+
+                                    print('this is the current loan matched without being reversed')
+                                    
+                                    break                        
+                            
+                            except:
+                                print("not a match")
+
+                            try:
+                                if (int(translatedForEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
+
+                                    equifaxPaymentsOnCurrent += int(cmd[1])
+
+                                    print('this is the current loan matched without being reversed')
+
+                                    break   
+                            except:
+                                print('not a match')
+                            
+                            try:
+                                # checking to see if they match while being reversed
+                                if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[1])):
+                                    
+                                    # adding the months from ths loan to the total payments on current if they match this way
+                                    equifaxPaymentsOnCurrent += int(cmd[1])
+
+                                    print('these numbers matched reversed')
+                                    
+                                    break
+                            except:
+                                print('not a match')
+                            
+                            try:
+                                if(int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
+
+                                    # adding the months from ths loan to the total payments on current if they match this way
+                                    equifaxPaymentsOnCurrent += int(cmd[1])
+
+                                    print('these numbers matched reversed')
+                                    
+                                    break
+                            except:
+                                print('not a match')
+                                
+                            else:
+                                print('this isint a match')
+                                    
+                                
+
+                            print(translatedForEquifaxNumbers)
+                            
+                            print(currentLoanPayoffs)
+
+
+
+                        # if it isnt open this is what we do when its closed
+                        else:
+                            print('CLOSED LOAN')
+
+
+                        
+            print(equifaxTotalMonths)
+            print(equifaxTotalOpenLoans)
+            print(equifaxPaymentsOnCurrent)
+
+            # totalPaymentHistory, paymentsOnCurrent, openAutoLines
+            googleSheetNumberfilter(equifaxTotalMonths, equifaxPaymentsOnCurrent, equifaxTotalOpenLoans)
+
+            print('new data')
+
+            print(totalLoanCount)
+            print(currentLoanMonths)
+            print(totalOpenLoanCount)
+
+
+
+
+
+
+        
+        
+
+        
+        elif y:
+            print('this was made with the new lender')
+
+            # variable to keep track of the total number of months
+            transUnionTotalMonths = 0
+
+            # variable to keep track of total open loans
+            transUnionTotalOpenLoans = 0
+
+            # variable to keep track of number of payments on current loan
+            transUnionPaymentsOnCurent = 0
+
+            
+            transUnionData = extractDataTransunion.extractAllData(bureauData)
+
+            # getting each loan
+            for loan in transUnionData:
+                
+                # setting the loans string to an intiger variable to add to the total months 
+                transUnionTotalMonthsInt = int(loan[1])
+
+                # Adding the total months intiger to the total months
+                transUnionTotalMonths += transUnionTotalMonthsInt
+
+                # if the loan is open
+                if loan[0] == 'OPEN':
+                    
+                    print(loan)
+
+                    # if its an open loan we add it to the total amount of open loans
+                    transUnionTotalOpenLoans += 1
+
+                    # giving the loan payoff list a variable ['20300.0', '10800.0']
+                    transUnionLoanPayoffList = loan[2]
+                    
+
+                    # checking each number in the list
+                    currentLoanPayoffs = []
+                            
+                    #translating the numbers so we can compare them to the numbers the bureau gives us
+                    translatedForTransUnionNumbers = []
+
+                    
+                    for number in transUnionLoanPayoffList:
+                        
+                        #getting rid of the comma in with the first variable
+                        translatedLoanPayoff = number.replace(".0", "")
+
+                        #  comparing the first three numbers siince the rest are zeros
+                        translatedLoanPayoff1 = translatedLoanPayoff[0:3]
+
+                        #appending the translated numbers to the list
+                        currentLoanPayoffs.append(translatedLoanPayoff1)
+
+                    
+                    print(currentLoanPayoffs)
+                    
+                    
+                    for num in translatedNums:
+
+                        # getting rid of the comma in with the first variable
+                        translatedNum = num.replace(",", "")
+
+                        # getting rid of the $ s we can turn it into an int later
+                        translatedNum1 = translatedNum.replace("$", "")
+                                
+                        # getting rid of the .00 with the second variable
+                        translatedNum2 = translatedNum1.replace(".00", "") 
+
+                        #  comparing the first three numbers since the rest are zeros
+                        translatedNum3 = translatedNum2[0:3]
+                                
+                        # appending the numbers to the list to be compared later
+                        translatedForTransUnionNumbers.append(translatedNum3)
+                    
+                    print(translatedForTransUnionNumbers)
+
+                    
+                    # checking the lists to see if they match without being revesed
+                    if (int(translatedForTransUnionNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForTransUnionNumbers[1]) == int(currentLoanPayoffs[1])):
+
+                        # adding the months from ths loan to the total payments on current if they match this way
+                        currentLoanMonthsInt = loan[1]
+                        
+                        transUnionPaymentsOnCurent += int(currentLoanMonthsInt)
+
+                        print('this is the current loan matched without being reversed')
+    
+                    else:
+                                    
+                        print('this isint a match')
+
+                
+
+                print(loan)
+            
+            print(transUnionTotalMonths)
+            print(transUnionTotalOpenLoans)
+            print(transUnionPaymentsOnCurent)
+            
+            # totalPaymentHistory, paymentsOnCurrent, openAutoLines
+            googleSheetNumberfilter(transUnionTotalMonths, transUnionPaymentsOnCurent, transUnionTotalOpenLoans)
+
+            
+        
+        
+        elif s:
+
+            # the total count of the months on every auto loan 
+            totalLoanCount.append('24+')
+            
+            # the total number of open loans
+            totalOpenLoanCount.append("1")
+            
+            # The number of months on the current
+            currentLoanMonths.append("12+")
+
+            print('credit bureau error')
+
+
+            
+
+        elif q:
+
+            # the total count of the months on every auto loan 
+            totalLoanCount.append('24+')
+            
+            # the total number of open loans
+            totalOpenLoanCount.append("1")
+            
+            # The number of months on the current
+            currentLoanMonths.append("12+")
+
+            print('credit bureau error')
+        
+        
+        # if we get file frozen due to federal legislation error
+        elif g:
+
+            # the total count of the months on every auto loan 
+            totalLoanCount.append('24+')
+            
+            # the total number of open loans
+            totalOpenLoanCount.append("1")
+            
+            # The number of months on the current
+            currentLoanMonths.append("12+")
+
+            print('credit bureau error')
+
+
+        else: 
+            
+            
+            print('not eqifax')
+            returnedData = auto.get_nonequifax_auto_data(bureauData)
+            
+            
+
+            
+            # variable to keep track of the total number of months
+            nonEquifaxTotalMonths = 0
+
+            # variable to keep track of total open loans
+            nonEquifaxTotalOpenLoans = 0
+
+            # variable to keep track of number of payments on current loan
+            nonEquifaxPaymentsOnCurent = 0
+            
+            for data in returnedData:
+                
+                # giving each loan a variable to be able to store its data
+                cmd = data['status'], data['months'], data["prices"]
+                
+                print(cmd)
+
+                if cmd[0] == "N/A":
+                    
+                    print('INVALID LOAN')
+                
+                else:
+
                     # turning each months from loan into and intiger to use later 
-                    equifaxMonthsStrToInt = int(cmd[1])
+                    nonEquifaxMonthsStrToInt = int(cmd[1])
+                    
                     # adding each loan months to the total months loan 
-                    equifaxTotalMonths += equifaxMonthsStrToInt
+                    nonEquifaxTotalMonths += nonEquifaxMonthsStrToInt
 
                     # checking to see if it is an open or closed loan
                     if cmd[0] == "OPEN":
                         
                         # if its an open loan we add it to the total amount of open loans
-                        equifaxTotalOpenLoans += 1
+                        nonEquifaxTotalOpenLoans += 1
 
                         # giving the loan payoff list a variable
-                        equifaxLoanPayoff = (cmd[2])
-                        
+                        nonEquifaxLoanPayoff = (cmd[2])
+                            
                         # checking each number in the list
                         currentLoanPayoffs = []
-                        
+                            
                         #translating the numbers so we can compare them to the numbers the bureau gives us
-                        translatedForEquifaxNumbers = []
+                        translatedForNonEquifaxNumbers = []
 
-                        # getting the number from this loan and putting them into a list to compare to the payoff numbers on the app 
-                        for number in equifaxLoanPayoff:
+                        for num in nonEquifaxLoanPayoff:
                             
-                            # if the loan gives back a special case of a value with 0
-                            if number == '$':
-                                
-                                # filling the empty value with 0
-                                numTranslated = number.replace('$', "0")
+                            # getting rid of the $ with the second variable
+                            translatedN = num.replace("$", "")
 
-                                # appending to the list
-                                currentLoanPayoffs.append(numTranslated)
+                            translatedN1 = translatedN.replace(",", "") 
+                                    
+                            # appending the numbers to the list to be compared later
+                            currentLoanPayoffs.append(translatedN1)
                             
-                            else:
-                                # translating the numbers to match later
-                                numTranslated = number.replace('$', "")
-                                
-                                # appending to the list
-                                currentLoanPayoffs.append(numTranslated)
-                        
+
                         # getting each number from the translated numbers var to compare them to the data in a new list with the numbers that are translated for equifax
                         for num in translatedNums:
-                            
 
                             #getting rid of the comma in with the first variable
                             translatedNum = num.replace(",", "")
 
                             # getting rid of the $ s we can turn it into an int later
                             translatedNum1 = translatedNum.replace("$", "")
-                            
+                                
                             # getting rid of the .00 with the second variable
                             translatedNum2 = translatedNum1.replace(".00", "") 
-                            
+                                
                             # appending the numbers to the list to be compared later
-                            translatedForEquifaxNumbers.append(translatedNum2)
+                            translatedForNonEquifaxNumbers.append(translatedNum2)
 
 
-                        try:
-                            # checking the lists to see if they match without being reversed
-                            if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
+                        # checking the lists to see if they match without being revesed
+                        if (int(translatedForNonEquifaxNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForNonEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
 
-                                # adding the months from ths loan to the total payments on current if they match this way
-                                equifaxPaymentsOnCurrent += int(cmd[1])
+                            # adding the months from ths loan to the total payments on current if they match this way
+                            nonEquifaxPaymentsOnCurent += int(cmd[1])
 
-                                print('this is the current loan matched without being reversed')
-                                
-                                break                        
+                            print('this is the current loan matched without being reversed')
                         
-                        except:
-                            print("not a match")
-
-                        try:
-                            if (int(translatedForEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
-
-                                equifaxPaymentsOnCurrent += int(cmd[1])
-
-                                print('this is the current loan matched without being reversed')
-
-                                break   
-                        except:
-                            print('not a match')
-                        
-                        try:
-                            # checking to see if they match while being reversed
-                            if (int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[1])):
+                        # checking to see if they match while being reversed
+                        elif (int(translatedForNonEquifaxNumbers[0]) == int(currentLoanPayoffs[1])) or (int(translatedForNonEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
                                 
-                                # adding the months from ths loan to the total payments on current if they match this way
-                                equifaxPaymentsOnCurrent += int(cmd[1])
 
-                                print('these numbers matched reversed')
+                            # adding the months from ths loan to the total payments on current if they match this way
+                            nonEquifaxPaymentsOnCurent += int(cmd[1])
+
+                            print('these numbers matched reversed')
                                 
-                                break
-                        except:
-                            print('not a match')
-                        
-                        try:
-                            if(int(translatedForEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
-
-                                # adding the months from ths loan to the total payments on current if they match this way
-                                equifaxPaymentsOnCurrent += int(cmd[1])
-
-                                print('these numbers matched reversed')
                                 
-                                break
-                        except:
-                            print('not a match')
-                            
                         else:
-                            print('this isint a match')
                                 
-                               
+                            print('this isint a match')
 
-                        print(translatedForEquifaxNumbers)
                         
+
                         print(currentLoanPayoffs)
+                        print(translatedForNonEquifaxNumbers)  
 
-
-
-                    # if it isnt open this is what we do when its closed
+                    
                     else:
                         print('CLOSED LOAN')
-
-
                     
-        print(equifaxTotalMonths)
-        print(equifaxTotalOpenLoans)
-        print(equifaxPaymentsOnCurrent)
-
-        # totalPaymentHistory, paymentsOnCurrent, openAutoLines
-        googleSheetNumberfilter(equifaxTotalMonths, equifaxPaymentsOnCurrent, equifaxTotalOpenLoans)
-
-        print('new data')
-
-        print(totalLoanCount)
-        print(currentLoanMonths)
-        print(totalOpenLoanCount)
-
-
-
-
-
-
-    
-    
-
-    
-    elif y:
-        print('this was made with the new lender')
-
-        # variable to keep track of the total number of months
-        transUnionTotalMonths = 0
-
-        # variable to keep track of total open loans
-        transUnionTotalOpenLoans = 0
-
-        # variable to keep track of number of payments on current loan
-        transUnionPaymentsOnCurent = 0
-
-        
-        transUnionData = extractDataTransunion.extractAllData(bureauData)
-
-        # getting each loan
-        for loan in transUnionData:
+                    
             
-            # setting the loans string to an intiger variable to add to the total months 
-            transUnionTotalMonthsInt = int(loan[1])
+            print(nonEquifaxTotalMonths)
+            print(nonEquifaxTotalOpenLoans)
+            print(nonEquifaxPaymentsOnCurent)
 
-            # Adding the total months intiger to the total months
-            transUnionTotalMonths += transUnionTotalMonthsInt
+            # totalPaymentHistory, paymentsOnCurrent, openAutoLines
+            googleSheetNumberfilter(nonEquifaxTotalMonths, nonEquifaxPaymentsOnCurent, nonEquifaxTotalOpenLoans)        
 
-            # if the loan is open
-            if loan[0] == 'OPEN':
-                
-                print(loan)
+            print('new data')
 
-                # if its an open loan we add it to the total amount of open loans
-                transUnionTotalOpenLoans += 1
+            print(totalLoanCount)
+            print(totalOpenLoanCount)
+            print(currentLoanMonths)
 
-                # giving the loan payoff list a variable ['20300.0', '10800.0']
-                transUnionLoanPayoffList = loan[2]
-                
-
-                # checking each number in the list
-                currentLoanPayoffs = []
-                        
-                #translating the numbers so we can compare them to the numbers the bureau gives us
-                translatedForTransUnionNumbers = []
-
-                
-                for number in transUnionLoanPayoffList:
-                    
-                    #getting rid of the comma in with the first variable
-                    translatedLoanPayoff = number.replace(".0", "")
-
-                    #  comparing the first three numbers siince the rest are zeros
-                    translatedLoanPayoff1 = translatedLoanPayoff[0:3]
-
-                    #appending the translated numbers to the list
-                    currentLoanPayoffs.append(translatedLoanPayoff1)
-
-                
-                print(currentLoanPayoffs)
-                
-                
-                for num in translatedNums:
-
-                    # getting rid of the comma in with the first variable
-                    translatedNum = num.replace(",", "")
-
-                    # getting rid of the $ s we can turn it into an int later
-                    translatedNum1 = translatedNum.replace("$", "")
-                            
-                    # getting rid of the .00 with the second variable
-                    translatedNum2 = translatedNum1.replace(".00", "") 
-
-                    #  comparing the first three numbers since the rest are zeros
-                    translatedNum3 = translatedNum2[0:3]
-                            
-                    # appending the numbers to the list to be compared later
-                    translatedForTransUnionNumbers.append(translatedNum3)
-                
-                print(translatedForTransUnionNumbers)
-
-                
-                # checking the lists to see if they match without being revesed
-                if (int(translatedForTransUnionNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForTransUnionNumbers[1]) == int(currentLoanPayoffs[1])):
-
-                    # adding the months from ths loan to the total payments on current if they match this way
-                    currentLoanMonthsInt = loan[1]
-                    
-                    transUnionPaymentsOnCurent += int(currentLoanMonthsInt)
-
-                    print('this is the current loan matched without being reversed')
- 
-                else:
-                                
-                    print('this isint a match')
-
-            
-
-            print(loan)
-        
-        print(transUnionTotalMonths)
-        print(transUnionTotalOpenLoans)
-        print(transUnionPaymentsOnCurent)
-        
-        # totalPaymentHistory, paymentsOnCurrent, openAutoLines
-        googleSheetNumberfilter(transUnionTotalMonths, transUnionPaymentsOnCurent, transUnionTotalOpenLoans)
-
-        
-    
-    
-    elif s:
-
-        # the total count of the months on every auto loan 
-        totalLoanCount.append('24+')
-        
-        # the total number of open loans
-        totalOpenLoanCount.append("1")
-        
-        # The number of months on the current
-        currentLoanMonths.append("12+")
-
-        print('credit bureau error')
-
-
-        
-
-    elif q:
-
-        # the total count of the months on every auto loan 
-        totalLoanCount.append('24+')
-        
-        # the total number of open loans
-        totalOpenLoanCount.append("1")
-        
-        # The number of months on the current
-        currentLoanMonths.append("12+")
-
-        print('credit bureau error')
-    
-    
-    # if we get file frozen due to federal legislation error
-    elif g:
-
-        # the total count of the months on every auto loan 
-        totalLoanCount.append('24+')
-        
-        # the total number of open loans
-        totalOpenLoanCount.append("1")
-        
-        # The number of months on the current
-        currentLoanMonths.append("12+")
-
-        print('credit bureau error')
-
-
-    else: 
-        
-        
-        print('not eqifax')
-        returnedData = auto.get_nonequifax_auto_data(bureauData)
-        
+except:
+    print('bureau data error')  
         
 
         
-        # variable to keep track of the total number of months
-        nonEquifaxTotalMonths = 0
-
-        # variable to keep track of total open loans
-        nonEquifaxTotalOpenLoans = 0
-
-        # variable to keep track of number of payments on current loan
-        nonEquifaxPaymentsOnCurent = 0
-        
-        for data in returnedData:
-            
-            # giving each loan a variable to be able to store its data
-            cmd = data['status'], data['months'], data["prices"]
-            
-            print(cmd)
-
-            if cmd[0] == "N/A":
-                
-                print('INVALID LOAN')
-            
-            else:
-
-                # turning each months from loan into and intiger to use later 
-                nonEquifaxMonthsStrToInt = int(cmd[1])
-                
-                # adding each loan months to the total months loan 
-                nonEquifaxTotalMonths += nonEquifaxMonthsStrToInt
-
-                # checking to see if it is an open or closed loan
-                if cmd[0] == "OPEN":
-                    
-                    # if its an open loan we add it to the total amount of open loans
-                    nonEquifaxTotalOpenLoans += 1
-
-                    # giving the loan payoff list a variable
-                    nonEquifaxLoanPayoff = (cmd[2])
-                        
-                    # checking each number in the list
-                    currentLoanPayoffs = []
-                        
-                    #translating the numbers so we can compare them to the numbers the bureau gives us
-                    translatedForNonEquifaxNumbers = []
-
-                    for num in nonEquifaxLoanPayoff:
-                        
-                        # getting rid of the $ with the second variable
-                        translatedN = num.replace("$", "")
-
-                        translatedN1 = translatedN.replace(",", "") 
-                                
-                        # appending the numbers to the list to be compared later
-                        currentLoanPayoffs.append(translatedN1)
-                        
-
-                    # getting each number from the translated numbers var to compare them to the data in a new list with the numbers that are translated for equifax
-                    for num in translatedNums:
-
-                        #getting rid of the comma in with the first variable
-                        translatedNum = num.replace(",", "")
-
-                        # getting rid of the $ s we can turn it into an int later
-                        translatedNum1 = translatedNum.replace("$", "")
-                            
-                        # getting rid of the .00 with the second variable
-                        translatedNum2 = translatedNum1.replace(".00", "") 
-                            
-                        # appending the numbers to the list to be compared later
-                        translatedForNonEquifaxNumbers.append(translatedNum2)
-
-
-                    # checking the lists to see if they match without being revesed
-                    if (int(translatedForNonEquifaxNumbers[0]) == int(currentLoanPayoffs[0])) or (int(translatedForNonEquifaxNumbers[1]) == int(currentLoanPayoffs[1])):
-
-                        # adding the months from ths loan to the total payments on current if they match this way
-                        nonEquifaxPaymentsOnCurent += int(cmd[1])
-
-                        print('this is the current loan matched without being reversed')
-                    
-                    # checking to see if they match while being reversed
-                    elif (int(translatedForNonEquifaxNumbers[0]) == int(currentLoanPayoffs[1])) or (int(translatedForNonEquifaxNumbers[0]) == int(currentLoanPayoffs[0])):
-                            
-
-                        # adding the months from ths loan to the total payments on current if they match this way
-                        nonEquifaxPaymentsOnCurent += int(cmd[1])
-
-                        print('these numbers matched reversed')
-                            
-                            
-                    else:
-                            
-                        print('this isint a match')
-
-                    
-
-                    print(currentLoanPayoffs)
-                    print(translatedForNonEquifaxNumbers)  
-
-                
-                else:
-                    print('CLOSED LOAN')
-                
-                
-        
-        print(nonEquifaxTotalMonths)
-        print(nonEquifaxTotalOpenLoans)
-        print(nonEquifaxPaymentsOnCurent)
-
-        # totalPaymentHistory, paymentsOnCurrent, openAutoLines
-        googleSheetNumberfilter(nonEquifaxTotalMonths, nonEquifaxPaymentsOnCurent, nonEquifaxTotalOpenLoans)        
-
-        print('new data')
-
-        print(totalLoanCount)
-        print(totalOpenLoanCount)
-        print(currentLoanMonths)
-        
-    
-
-        
-
-
-    
-        
-
-                
-        
-        
-
-
-
-
-
-
-
-        
-
 
 
     

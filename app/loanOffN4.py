@@ -189,18 +189,17 @@ def fillLoData(drive, ppqVer, aprRate):
 
     # Filling the form in to choose our user
     loSelect(loName)
-    time.sleep(1)
     
     # How we check the pp lender and fill the form depending on which one it is
     ppqCheck(ppqVer, needPpList, ppqButton)
 
 
-    time.sleep(1)
+   
     # Checking and filling in our apr rate
-    aprCheck()
+    # aprCheck()
     
 
-    time.sleep(1)
+
 
     # Saving the data again
     saveFilledDataMain()
