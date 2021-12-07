@@ -84,7 +84,7 @@ sdfsa = '95546850' # new lender weird stuff
 
 weh = '95615520' # NO RECORD FOUND 
 
-cur3 = LOAN_URL + ssa
+cur3 = LOAN_URL + "96919945"
 
 cur4 = LOAN_URL + fgb
 #gets everything from decision page

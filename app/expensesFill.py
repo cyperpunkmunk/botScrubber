@@ -48,7 +48,7 @@ drive = webdriver.Chrome(options=opts, executable_path=WEB_DRIVER_PATH)
 #logs in to homepage
 apphandler.login(drive, HOME_URL, USERNAME_ENV, PASSWORD_ENV)
 
-cur3 = LOAN_URL + '95527725'
+cur3 = LOAN_URL + '96919945'
 
 #gets everything from decision page
 apphandler.getAppData(cur3,drive)
@@ -72,32 +72,48 @@ spreadid = SPREAD_SHEET_ID
 apphandler.googleSheetfill(sco,jsfile,spreadid)
 
 
-payoff = 25520
 
-def expenseChecks(payoff):
+
+def expenseChecks():
 
     # clicking on the expenses tab
     expensesTab = drive.find_element(By.XPATH,'//*[@id="expenses"]')
     expensesTab.click()
+    
+    print('ar')
 
-    # uncheck first box
-    if payoff > 10000:
-
-        # getting each div from the boz that contains the payoffs 
-        payoffsList = drive.find_elements(By.CSS_SELECTOR , 'tr.ui-widget-content')
-
-        for item in payoffsList:
+    
+    wholeTable = drive.find_elements(By.XPATH ,'//table[@id="expensesGrid"]/tr')
+    if wholeTable:
+        print('good')
+    else:
+        print('bad')
+        
+    lastRow = len(wholeTable)
+    for row in wholeTable:
+        balanceValue = drive.find_element(By.XPATH, '//td[@aria-describedby="expensesGrid_Balance"]').text
+        balanceValue = balanceValue.replace('$', '')
+        balanceValue = float(balanceValue)
+        print(balanceValue)
+        firstClicked = False
+        lastClicked = False
+        if balanceValue > 80000 and lastClicked == False:
+            #uncheck last box
+            lastIncludeBox = drive.find_element_by_xpath(f'//tr[@id="{lastRow}"]/td[@aria-describedby="expensesGrid_Include"]/input')
+            lastIncludeBox.click()
+            lastClicked = True
             
-            try:
-                
-                hi = "hi"
-
-                se = item.find_element(By.XPATH, "//*[@id='+name+']/td[8]")
-                print(se)
-            
-            except:
-
-                print(('cant find it'))
+            firstIncludeBox = drive.find_element(By.XPATH, '//tr[@id="1"]/td[@aria-describedby="expensesGrid_Include"]/input')
+            firstIncludeBox.click()
+            firstClicked = True
+            print("hi")      
+        
+        elif balanceValue > 10000 and firstClicked == False:
+            #uncheck first box
+            firstIncludeBox = drive.find_element(By.XPATH, '//tr[@id="1"]/td[@aria-describedby="expensesGrid_Include"]/input')
+            firstIncludeBox.click()
+            firstClicked = True
+            print('hi')
 
         
     
@@ -113,5 +129,5 @@ def expenseChecks(payoff):
 
 
     
-expenseChecks(payoff)
+expenseChecks()
 

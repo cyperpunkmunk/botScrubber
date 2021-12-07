@@ -115,13 +115,15 @@ def fillLoData(drive, ppqVer, aprRate):
             subButton.submit()
             
             subButton = drive.find_element(By.XPATH, '//*[@id="btnSave"]')
-            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="522676"]' ))).send_keys(Keys.DELETE)
+            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.ID, '522672' ))).send_keys(Keys.CONTROL+"A")
             
-            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="522676"]' ))).send_keys("9")
+            time.sleep(1)
             
+            WebDriverWait(drive, 20).until(EC.element_to_be_clickable((By.ID, '522672' ))).send_keys("0.09")
             
+            time.sleep(3)
             
-            subButton.submit()
+            subButton.click()
             
             print('need apr')
             
@@ -193,10 +195,9 @@ def fillLoData(drive, ppqVer, aprRate):
     # How we check the pp lender and fill the form depending on which one it is
     ppqCheck(ppqVer, needPpList, ppqButton)
 
-
    
     # Checking and filling in our apr rate
-    # aprCheck()
+    aprCheck()
     
 
 
